@@ -5,8 +5,8 @@
 #include <caml/alloc.h>
 #include <alpm.h>
 
-#include "oalpm.h"
-#include "oalpm_options.h"
+#include "core.h"
+#include "opts.h"
 
 /* STRING OPTIONS ***********************************************************/
 

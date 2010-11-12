@@ -3,7 +3,7 @@
 #include <caml/fail.h>
 #include <caml/callback.h>
 #include <alpm.h>
-#include "oalpm.h"
+#include "core.h"
 
 CAMLprim value oalpm_initialize ( value unit )
 {
