@@ -11,7 +11,12 @@ let _ =
   Alpm.addopt_cachedir "/bad/" ;
   print_list ( Alpm.getopt_cachedirs () ) ;
   Alpm.setopt_cachedirs [ "/lib/cache/pacman" ; "/cache" ] ;
-  print_list ( Alpm.getopt_cachedirs () ) ;;
-
-
-  
+  print_list ( Alpm.getopt_cachedirs () ) ;
+  Alpm.setopt_usedelta true ;
+  print_endline
+    ( if Alpm.getopt_usedelta () then "Using deltas"
+      else "Not using deltas" ) ;
+  Alpm.setopt_usesyslog false ;
+  print_endline
+    ( if Alpm.getopt_usesyslog () then "Using the syslog"
+    else "Not using the syslog" ) ;;

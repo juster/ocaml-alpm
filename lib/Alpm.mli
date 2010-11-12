@@ -37,3 +37,9 @@ val setopt_ignoregrps : string list -> unit
 val getopt_ignoregrps : unit -> string list
 val addopt_ignoregrp  : string -> unit
 val remopt_ignoregrp  : string -> unit
+
+(* Boolean Options *)
+val setopt_usesyslog : bool -> unit
+val getopt_usesyslog : unit -> bool
+val setopt_usedelta : bool -> unit
+val getopt_usedelta : unit -> bool

@@ -44,3 +44,5 @@ CAMLprim value oalpm_option_add_cachedir ( value str )
     OALPMreturn( alpm_option_add_cachedir( String_val( str )));
 }
 
+OALPM_OPT_BOOL( usesyslog )
+OALPM_OPT_BOOL( usedelta )

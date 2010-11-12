@@ -42,6 +42,12 @@ external getopt_ignoregrps : unit -> string list = "oalpm_option_get_ignoregrps"
 external addopt_ignoregrp : string -> unit = "oalpm_option_add_ignoregrp"
 external remopt_ignoregrp : string -> unit = "oalpm_option_rem_ignoregrp"
 
+(* Boolean Options *)
+external setopt_usesyslog : bool -> unit = "oalpm_option_set_usesyslog"
+external getopt_usesyslog : unit -> bool = "oalpm_option_get_usesyslog"
+external setopt_usedelta : bool -> unit = "oalpm_option_set_usedelta"
+external getopt_usedelta : unit -> bool = "oalpm_option_get_usedelta"
+
 (* We must register our exception to allow the C code to use it. *)
 let () =
   Callback.register_exception "AlpmError" (Error "any string")

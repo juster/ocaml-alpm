@@ -61,4 +61,23 @@
     OALPM_ADD_OPT_STRLIST( NAME )      \
     OALPM_REM_OPT_STRLIST( NAME )
 
+#define OALPM_GET_OPT_BOOL( NAME )                              \
+    CAMLprim value oalpm_option_get_ ## NAME ( value unit )     \
+    {                                                           \
+        CAMLparam1( unit );                                     \
+        CAMLreturn( Val_int( alpm_option_get_ ## NAME () ));    \
+    }
+
+#define OALPM_SET_OPT_BOOL( NAME ) \
+    CAMLprim value oalpm_option_set_ ## NAME ( value bool )   \
+    {                                                   \
+        CAMLparam1( bool );                             \
+        alpm_option_set_ ## NAME ( Int_val( bool ));    \
+        CAMLreturn( Val_unit );                         \
+    }
+
+#define OALPM_OPT_BOOL( NAME ) \
+    OALPM_GET_OPT_BOOL( NAME ) \
+    OALPM_SET_OPT_BOOL( NAME )
+
 #endif /*_OALPM_OPTIONS_H*/
