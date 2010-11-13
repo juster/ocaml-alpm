@@ -1,4 +1,6 @@
-exception Error of string
+type log_level = LogError | LogWarning | LogDebug | LogFunction
+
+exception AlpmError of string
 
 val init    : unit -> unit
 val release : unit -> unit
@@ -43,3 +45,16 @@ val setopt_usesyslog : bool -> unit
 val getopt_usesyslog : unit -> bool
 val setopt_usedelta : bool -> unit
 val getopt_usedelta : unit -> bool
+
+(* Callbacks *)
+val enable_logcb : (log_level -> string -> unit) -> unit
+val disable_logcb : unit -> unit
+
+val enable_dlcb : (string -> int -> int -> unit) -> unit
+val disable_dlcb : unit -> unit
+
+val enable_totaldlcb : (int -> unit) -> unit
+val disable_totaldlcb : unit -> unit
+
+val enable_fetchcb : (string -> string -> bool -> int) -> unit
+val disable_fetchcb : unit -> unit

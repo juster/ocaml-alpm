@@ -1,6 +1,6 @@
-type option_name  = RootDir
+type log_level = LogError | LogWarning | LogDebug | LogFunction
 
-exception Error of string
+exception AlpmError of string
 
 (* Basic ALPM functions *)
 external init    : unit -> unit = "oalpm_initialize"
@@ -48,6 +48,27 @@ external getopt_usesyslog : unit -> bool = "oalpm_option_get_usesyslog"
 external setopt_usedelta : bool -> unit = "oalpm_option_set_usedelta"
 external getopt_usedelta : unit -> bool = "oalpm_option_get_usedelta"
 
+(* Callback Options *)
+
+external disable_logcb     : unit -> unit = "oalpm_disable_log_cb"
+external disable_dlcb      : unit -> unit = "oalpm_disable_dl_cb"
+external disable_totaldlcb : unit -> unit = "oalpm_disable_totaldl_cb"
+external disable_fetchcb   : unit -> unit = "oalpm_disable_fetch_cb"
+
+external oalpm_enable_log_cb     : unit -> unit = "oalpm_enable_log_cb"
+external oalpm_enable_dl_cb      : unit -> unit = "oalpm_enable_dl_cb"
+external oalpm_enable_totaldl_cb : unit -> unit = "oalpm_enable_totaldl_cb"
+external oalpm_enable_fetch_cb   : unit -> unit = "oalpm_enable_fetch_cb"
+
+let enable_logcb cb =
+  Callback.register "log callback" cb ; oalpm_enable_log_cb ()
+and enable_dlcb cb =
+  Callback.register "dl callback" cb ; oalpm_enable_dl_cb ()
+and enable_totaldlcb cb =
+  Callback.register "totaldl callback" cb ; oalpm_enable_totaldl_cb ()
+and enable_fetchcb cb =
+  Callback.register "fetch callback" cb ; oalpm_enable_fetch_cb ()
+
 (* We must register our exception to allow the C code to use it. *)
 let () =
-  Callback.register_exception "AlpmError" (Error "any string")
+  Callback.register_exception "AlpmError" (AlpmError "any string")
