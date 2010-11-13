@@ -1,5 +1,3 @@
-open Alpm
-
 let rec print_list list =
   match list with
     []     -> print_endline ""
@@ -7,10 +5,10 @@ let rec print_list list =
 
 let level_string level =
   match level with
-    LogWarning  -> "warning"
-  | LogDebug    -> "debug"
-  | LogError    -> "error"
-  | LogFunction -> "function"
+    Alpm.LogWarning  -> "warning"
+  | Alpm.LogDebug    -> "debug"
+  | Alpm.LogError    -> "error"
+  | Alpm.LogFunction -> "function"
 
 let logger level msg =
   print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
@@ -18,20 +16,20 @@ let logger level msg =
 let _ =
   Alpm.init ();
   Alpm.enable_logcb logger ;
-  Alpm.setopt_root "/";
-  Alpm.addopt_cachedir "/lib/cache/pacman" ;
-  print_list ( Alpm.getopt_cachedirs () ) ;
+  Alpm.set_root "/";
+  Alpm.add_cachedir "/lib/cache/pacman" ;
+  print_list ( Alpm.get_cachedirs () ) ;
   Alpm.disable_logcb () ;
-  Alpm.addopt_cachedir "/bad/" ;
-  print_list ( Alpm.getopt_cachedirs () ) ;
-  Alpm.setopt_cachedirs [ "/lib/cache/pacman" ; "/cache" ] ;
-  print_list ( Alpm.getopt_cachedirs () ) ;
-  Alpm.setopt_usedelta true ;
+  Alpm.add_cachedir "/bad/" ;
+  print_list ( Alpm.get_cachedirs () ) ;
+  Alpm.set_cachedirs [ "/lib/cache/pacman" ; "/cache" ] ;
+  print_list ( Alpm.get_cachedirs () ) ;
+  Alpm.set_usedelta true ;
   print_endline
-    ( if Alpm.getopt_usedelta () then "Using deltas"
+    ( if Alpm.get_usedelta () then "Using deltas"
     else "Not using deltas" ) ;
-  Alpm.setopt_usesyslog false ;
+  Alpm.set_usesyslog false ;
   print_endline
-    ( if Alpm.getopt_usesyslog () then "Using the syslog"
+    ( if Alpm.get_usesyslog () then "Using the syslog"
     else "Not using the syslog" ) ;
   Alpm.enable_logcb logger
