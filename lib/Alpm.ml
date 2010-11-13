@@ -1,6 +1,8 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
+type database
 
 exception AlpmError of string
+exception NoLocalDB
 
 (* Basic ALPM functions *)
 external init    : unit -> unit = "oalpm_initialize"
@@ -69,6 +71,16 @@ let enable_totaldlcb cb =
 let enable_fetchcb cb =
   Callback.register "fetch callback" cb ; oalpm_enable_fetch_cb ()
 
+(* Database accessors/mutators *)
+external register : string -> database    = "oalpm_register"
+external localdb  : unit -> database      = "oalpm_localdb"
+external syncdbs  : unit -> database list = "oalpm_syncdbs"
+
+external db_name  : database -> string    = "oalpm_db_get_name"
+external db_url   : database -> string    = "oalpm_db_get_url"
+external db_addurl : database -> string -> unit = "oalpm_db_add_url"
+
 (* We must register our exception to allow the C code to use it. *)
 let () =
-  Callback.register_exception "AlpmError" (AlpmError "any string")
+  Callback.register_exception "AlpmError" (AlpmError "any string") ;
+  Callback.register_exception "NoLocalDB" (NoLocalDB)

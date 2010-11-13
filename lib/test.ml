@@ -32,4 +32,14 @@ let _ =
   print_endline
     ( if Alpm.get_usesyslog () then "Using the syslog"
     else "Not using the syslog" ) ;
-  Alpm.enable_logcb logger
+  Alpm.enable_logcb logger ;
+  Alpm.register "local" ;
+  Alpm.register "extra" ;
+  Alpm.register "community" ;
+  
+  let dbs = Alpm.syncdbs () in
+  print_int (List.length dbs) ; print_newline () ;
+
+  print_endline( Alpm.db_name( List.hd dbs ));
+  Alpm.db_addurl (List.hd dbs) "http://juster.info";
+  print_endline( Alpm.db_url( List.hd dbs ));

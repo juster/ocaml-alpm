@@ -1,6 +1,8 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
+type database
 
 exception AlpmError of string
+exception NoLocalDB
 
 val init    : unit -> unit
 val release : unit -> unit
@@ -58,3 +60,14 @@ val disable_totaldlcb : unit -> unit
 
 val enable_fetchcb : (string -> string -> bool -> int) -> unit
 val disable_fetchcb : unit -> unit
+
+(* Database mutators/accessors *)
+val register : string -> database
+val localdb  : unit -> database
+val syncdbs  : unit -> database list
+
+(* Database functions *)
+val db_name : database -> string
+val db_url  : database -> string
+val db_addurl : database -> string -> unit
+
