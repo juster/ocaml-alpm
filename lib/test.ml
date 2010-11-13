@@ -33,13 +33,28 @@ let _ =
     ( if Alpm.get_usesyslog () then "Using the syslog"
     else "Not using the syslog" ) ;
   Alpm.enable_logcb logger ;
-  Alpm.register "local" ;
-  Alpm.register "extra" ;
-  Alpm.register "community" ;
+  let localdb = Alpm.new_db "local" in
+  let extradb = Alpm.new_db "extra" in
+  let communitydb = Alpm.new_db "community" in
   
   let dbs = Alpm.syncdbs () in
-  print_int (List.length dbs) ; print_newline () ;
+  print_int (List.length dbs) ; print_newline ();
 
-  print_endline( Alpm.db_name( List.hd dbs ));
+  print_endline (Alpm.db_name (List.hd dbs));
   Alpm.db_addurl (List.hd dbs) "http://juster.info";
-  print_endline( Alpm.db_url( List.hd dbs ));
+  print_endline (Alpm.db_url extradb);
+
+  let lookupdb = Alpm.db "community" in
+  if (Alpm.db_name lookupdb) <> (Alpm.db_name communitydb) then
+    raise (Failure "db func could not lookup community") ;
+  print_endline "db func works";
+
+  print_endline ("DBNotFound error " ^
+                 (try Alpm.db "foobar" ; "doesn't fire"
+                 with Alpm.DBNotFound -> "fires off")) ;
+
+  let test_localurl unit =
+    print_endline
+      (try Alpm.db_url localdb with Failure(str) -> "ERROR: " ^ str)
+  in test_localurl ()
+  

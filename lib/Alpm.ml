@@ -3,6 +3,7 @@ type database
 
 exception AlpmError of string
 exception NoLocalDB
+exception DBNotFound
 
 (* Basic ALPM functions *)
 external init    : unit -> unit = "oalpm_initialize"
@@ -71,13 +72,20 @@ let enable_fetchcb cb =
   Callback.register "fetch callback" cb ; oalpm_enable_fetch_cb ()
 
 (* Database accessors/mutators *)
-external register : string -> database    = "oalpm_register"
-external localdb  : unit -> database      = "oalpm_localdb"
-external syncdbs  : unit -> database list = "oalpm_syncdbs"
+external new_db  : string -> database    = "oalpm_register"
+external localdb : unit -> database      = "oalpm_localdb"
+external syncdbs : unit -> database list = "oalpm_syncdbs"
 
 external db_name  : database -> string    = "oalpm_db_get_name"
 external db_url   : database -> string    = "oalpm_db_get_url"
 external db_addurl : database -> string -> unit = "oalpm_db_add_url"
+
+let db name =
+  let rec find_db name dblist =
+    match dblist with
+      []     -> raise DBNotFound
+    | hd::tl -> if (db_name hd) = name then hd else find_db name tl
+  in find_db name (syncdbs ())
 
 (* We must register our exception to allow the C code to use it. *)
 let () =

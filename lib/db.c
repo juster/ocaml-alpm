@@ -8,6 +8,7 @@
 
 #include "core.h"
 #include "datatypes.h"
+#include "errors.h"
 
 CAMLprim value oalpm_db_get_name ( value db )
 {
@@ -21,7 +22,7 @@ CAMLprim value oalpm_db_get_url ( value db )
     
     pmdb_t * alpmdb = Database_val( db );
     if ( strcmp( alpm_db_get_name( alpmdb ), "local" ) == 0 ) {
-        caml_failwith( "The local database has no url" );
+        caml_failwith( FAIL_LOCALDB_URL );
     }
 
     CAMLreturn( caml_copy_string( alpm_db_get_url( alpmdb )));

@@ -3,6 +3,7 @@ type database
 
 exception AlpmError of string
 exception NoLocalDB
+exception DBNotFound
 
 val init    : unit -> unit
 val release : unit -> unit
@@ -62,9 +63,10 @@ val enable_fetchcb : (string -> string -> bool -> int) -> unit
 val disable_fetchcb : unit -> unit
 
 (* Database mutators/accessors *)
-val register : string -> database
-val localdb  : unit -> database
-val syncdbs  : unit -> database list
+val new_db  : string -> database
+val localdb : unit -> database
+val syncdbs : unit -> database list
+val db      : string -> database
 
 (* Database functions *)
 val db_name : database -> string
