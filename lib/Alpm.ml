@@ -51,7 +51,6 @@ external set_usedelta : bool -> unit = "oalpm_option_set_usedelta"
 external get_usedelta : unit -> bool = "oalpm_option_get_usedelta"
 
 (* Callback Options *)
-
 external disable_logcb     : unit -> unit = "oalpm_disable_log_cb"
 external disable_dlcb      : unit -> unit = "oalpm_disable_dl_cb"
 external disable_totaldlcb : unit -> unit = "oalpm_disable_totaldl_cb"
