@@ -62,11 +62,11 @@ external oalpm_enable_fetch_cb   : unit -> unit = "oalpm_enable_fetch_cb"
 
 let enable_logcb cb =
   Callback.register "log callback" cb ; oalpm_enable_log_cb ()
-and enable_dlcb cb =
+let enable_dlcb cb =
   Callback.register "dl callback" cb ; oalpm_enable_dl_cb ()
-and enable_totaldlcb cb =
+let enable_totaldlcb cb =
   Callback.register "totaldl callback" cb ; oalpm_enable_totaldl_cb ()
-and enable_fetchcb cb =
+let enable_fetchcb cb =
   Callback.register "fetch callback" cb ; oalpm_enable_fetch_cb ()
 
 (* We must register our exception to allow the C code to use it. *)
