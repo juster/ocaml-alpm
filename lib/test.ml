@@ -23,7 +23,10 @@ let _ =
 
   let localdb = Alpm.new_db "local" in print_endline (localdb#name) ;
   let pkgs = localdb#packages in
-  let dump_perl_pkg pkg = pkg#checkmd5sum in
+  let dump_perl_pkg pkg =
+    print_endline ("Perl package is in the " ^ pkg#db#name ^ " database.") ;
+    pkg#checkmd5sum ;
+  in
 
   List.iter (fun pkg -> if pkg#name = "perl" then dump_perl_pkg pkg) pkgs
 

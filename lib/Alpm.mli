@@ -22,9 +22,9 @@ class type package =
     method replaces   : string list
     method files      : string list
     method backup     : string list
+    method db         : database
   end
-
-class type database =
+and database =
   object
     method name     : string
     method url      : string

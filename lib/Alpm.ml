@@ -113,9 +113,18 @@ external pkg_get_files : alpm_package -> string list
     = "oalpm_pkg_get_files"
 external pkg_get_backup : alpm_package -> string list
     = "oalpm_pkg_get_backup"
+external pkg_get_db : alpm_package -> alpm_database
+    = "oalpm_pkg_get_db"
+
+(* DATABASES *)
+external db_name      : alpm_database -> string    = "oalpm_db_get_name"
+external db_url       : alpm_database -> string    = "oalpm_db_get_url"
+external db_addurl    : alpm_database -> string -> unit = "oalpm_db_add_url"
+external db_pkgcache  : alpm_database -> alpm_package list
+    = "oalpm_db_get_pkgcache"
 
 class package pkg_data =
-  object
+  object(self)
     method name     = pkg_name pkg_data
     method filename = pkg_filename pkg_data
     method version  = pkg_version pkg_data
@@ -125,7 +134,6 @@ class package pkg_data =
     method md5sum   = pkg_md5sum pkg_data
     method arch     = pkg_arch pkg_data
     method checkmd5sum = pkg_checkmd5sum pkg_data
-
     method requiredby = pkg_requiredby pkg_data
     method licenses   = pkg_get_licenses pkg_data
     method groups     = pkg_get_groups pkg_data
@@ -136,18 +144,9 @@ class package pkg_data =
     method replaces   = pkg_get_replaces pkg_data
     method files      = pkg_get_files pkg_data
     method backup     = pkg_get_backup pkg_data
+    method db         = new database (pkg_get_db pkg_data)
   end
-
-let load_pkgfile path = new package (oalpm_load_pkgfile path)
-
-(* DATABASES *)
-external db_name      : alpm_database -> string    = "oalpm_db_get_name"
-external db_url       : alpm_database -> string    = "oalpm_db_get_url"
-external db_addurl    : alpm_database -> string -> unit = "oalpm_db_add_url"
-external db_pkgcache  : alpm_database -> alpm_package list
-    = "oalpm_db_get_pkgcache"
-
-class database db_data =
+and database db_data =
   object
     method name     = db_name db_data
     method url      = db_url db_data
@@ -155,6 +154,10 @@ class database db_data =
     method packages =
       List.map (fun pkg -> new package pkg) (db_pkgcache db_data)
   end
+
+
+let load_pkgfile path = new package (oalpm_load_pkgfile path)
+
 
 let new_db name  = new database (oalpm_register name)
 let localdb unit = new database (option_get_localdb ())

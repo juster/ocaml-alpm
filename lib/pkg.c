@@ -36,4 +36,8 @@ CAMLprim value oalpm_pkg_checkmd5sum ( value package )
     OALPMreturn( alpm_pkg_checkmd5sum( Package_val( package )));
 }
 
-
+CAMLprim value oalpm_pkg_get_db ( value package )
+{
+    CAMLparam1( package );
+    CAMLreturn( alloc_alpm_db( alpm_pkg_get_db( Package_val( package ))));
+}
