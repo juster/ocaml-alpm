@@ -1,9 +1,9 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
 type database
+type package
 
 exception AlpmError of string
 exception NoLocalDB
-exception DBNotFound
 
 val init    : unit -> unit
 val release : unit -> unit
@@ -69,7 +69,17 @@ val syncdbs : unit -> database list
 val db      : string -> database
 
 (* Database functions *)
-val db_name : database -> string
-val db_url  : database -> string
-val db_addurl : database -> string -> unit
+val db_name     : database -> string
+val db_url      : database -> string
+val db_addurl   : database -> string -> unit
+val db_packages : database -> package list
 
+(* PACKAGES *)
+val pkg_name : package -> string
+val pkg_filename : package -> string
+val pkg_version : package -> string
+val pkg_desc : package -> string
+val pkg_url : package -> string
+val pkg_packager : package -> string
+val pkg_md5sum : package -> string
+val pkg_arch : package -> string

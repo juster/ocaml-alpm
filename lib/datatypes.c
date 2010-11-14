@@ -13,6 +13,9 @@
 
 #include "datatypes.h"
 
+CUSTOM_ALPM_TYPE( db, Database )
+CUSTOM_ALPM_TYPE( pkg, Package )
+
 value alpm_to_caml_list ( alpm_list_t * list, alpm_elem_conv converter )
 {
     CAMLparam0();
@@ -66,6 +69,10 @@ value alpm_to_caml_dbelem ( void * elem )
     return alloc_alpm_db( (pmdb_t *) elem );
 }
 
+value alpm_to_caml_pkgelem ( void * elem )
+{
+    return alloc_alpm_pkg( (pmpkg_t *) elem );
+}
 
 alpm_list_t * caml_to_alpm_list ( value list,
                                   caml_elem_conv converter )
@@ -92,23 +99,5 @@ void * caml_to_alpm_strelem ( value str )
             len * sizeof( char ));
 
     return (void *) alpm_str;
-}
-
-static struct custom_operations alpm_db_opts = {
-    "org.archlinux.caml.alpm.database",
-    custom_finalize_default,
-    custom_compare_default,
-    custom_hash_default,
-    custom_serialize_default,
-    custom_deserialize_default,
-};
-
-value alloc_alpm_db ( pmdb_t * db )
-{
-    value camldb = alloc_custom( &alpm_db_opts,
-                                 sizeof ( pmdb_t * ),
-                                 0, 1 );
-    Database_val( camldb ) = db;
-    return camldb;
 }
 

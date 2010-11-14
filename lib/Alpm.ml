@@ -1,9 +1,9 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
 type database
+type package
 
 exception AlpmError of string
 exception NoLocalDB
-exception DBNotFound
 
 (* Basic ALPM functions *)
 external init    : unit -> unit = "oalpm_initialize"
@@ -79,11 +79,22 @@ external syncdbs : unit -> database list = "oalpm_syncdbs"
 external db_name  : database -> string    = "oalpm_db_get_name"
 external db_url   : database -> string    = "oalpm_db_get_url"
 external db_addurl : database -> string -> unit = "oalpm_db_add_url"
+external db_packages : database -> package list = "oalpm_db_packages"
+
+(* PACKAGES *)
+external pkg_name : package -> string = "oalpm_pkg_get_name"
+external pkg_filename : package -> string = "oalpm_pkg_get_filename"
+external pkg_version : package -> string = "oalpm_pkg_get_version"
+external pkg_desc : package -> string = "oalpm_pkg_get_desc"
+external pkg_url : package -> string = "oalpm_pkg_get_url"
+external pkg_packager : package -> string = "oalpm_pkg_get_packager"
+external pkg_md5sum : package -> string = "oalpm_pkg_get_md5sum"
+external pkg_arch : package -> string = "oalpm_pkg_get_arch"
 
 let db name =
   let rec find_db name dblist =
     match dblist with
-      []     -> raise DBNotFound
+      []     -> raise Not_found
     | hd::tl -> if (db_name hd) = name then hd else find_db name tl
   in find_db name (syncdbs ())
 

@@ -34,3 +34,12 @@ CAMLprim value oalpm_db_add_url ( value db, value url )
     OALPMreturn( alpm_db_setserver( Database_val( db ),
                                     String_val( url )));
 }
+
+CAMLprim value oalpm_db_packages ( value db )
+{
+    alpm_list_t * pkg_list;
+
+    CAMLparam1( db );
+    pkg_list = alpm_db_get_pkgcache( Database_val( db ));
+    CAMLreturn( CAML_PKG_LIST( pkg_list ));
+}
