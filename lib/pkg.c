@@ -18,3 +18,5 @@ OALPM_PKG_GET_STR( url )
 OALPM_PKG_GET_STR( packager )
 OALPM_PKG_GET_STR( md5sum )
 OALPM_PKG_GET_STR( arch )
+
+OALPM_PKG_GET_STRLIST( compute_requiredby )

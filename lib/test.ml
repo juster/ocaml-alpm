@@ -22,11 +22,10 @@ let _ =
   Alpm.set_logfile "test.log" ;
 
   let localdb = Alpm.new_db "local" in print_endline (localdb#name) ;
-  localdb#packages ;
-
-  Alpm.new_db "extra" ;
-  let extradb = Alpm.db "extra" in
-  print_endline ("Found " ^ extradb#name ^ " database.");
+  let pkgs = localdb#packages in
+  List.iter (fun pkg -> if pkg#name = "perl" then
+    List.iter (fun name -> print_endline name) pkg#requiredby)
+    pkgs
 
   (* let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in *)
   (* print_endline (perlpkg#name ^ " " ^ perlpkg#version) *)

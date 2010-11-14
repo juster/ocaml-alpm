@@ -91,6 +91,7 @@ external pkg_packager : alpm_package -> string
     = "oalpm_pkg_get_packager"
 external pkg_md5sum   : alpm_package -> string = "oalpm_pkg_get_md5sum"
 external pkg_arch     : alpm_package -> string = "oalpm_pkg_get_arch"
+external pkg_requiredby : alpm_package -> string list = "oalpm_pkg_compute_requiredby"
 
 class package pkg_data =
   object
@@ -102,6 +103,7 @@ class package pkg_data =
     method packager = pkg_packager pkg_data
     method md5sum   = pkg_md5sum pkg_data
     method arch     = pkg_arch pkg_data
+    method requiredby = pkg_requiredby pkg_data
   end
 
 let load_pkgfile path = new package (oalpm_load_pkgfile path)

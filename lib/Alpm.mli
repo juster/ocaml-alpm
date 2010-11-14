@@ -10,6 +10,7 @@ class type package =
     method packager : string
     method md5sum   : string
     method arch     : string
+    method requiredby : string list
   end
 
 class type database =
