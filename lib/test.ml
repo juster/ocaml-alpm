@@ -1,3 +1,5 @@
+open Alpm
+
 let rec print_list list =
   match list with
     []     -> print_endline ""
@@ -5,10 +7,10 @@ let rec print_list list =
 
 let level_string level =
   match level with
-    Alpm.LogWarning  -> "warning"
-  | Alpm.LogDebug    -> "debug"
-  | Alpm.LogError    -> "error"
-  | Alpm.LogFunction -> "function"
+    LogWarning  -> "warning"
+  | LogDebug    -> "debug"
+  | LogError    -> "error"
+  | LogFunction -> "function"
 
 let logger level msg =
   print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
@@ -25,6 +27,10 @@ let _ =
   let pkgs = localdb#packages in
   let dump_perl_pkg pkg =
     print_endline ("Perl package is in the " ^ pkg#db#name ^ " database.") ;
+    print_endline ("Installed " ^
+                   ( match pkg#reason with
+                   |  Explicit -> "explicitly."
+                   |  Dependency -> "as a dependency.")) ;
     pkg#checkmd5sum ;
   in
 

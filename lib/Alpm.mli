@@ -1,4 +1,5 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
+type reason = Explicit | Dependency
 
 class type package =
   object
@@ -22,6 +23,8 @@ class type package =
     method replaces   : string list
     method files      : string list
     method backup     : string list
+
+    method reason     : reason
     method db         : database
   end
 and database =
