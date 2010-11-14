@@ -20,3 +20,11 @@ OALPM_PKG_GET_STR( md5sum )
 OALPM_PKG_GET_STR( arch )
 
 OALPM_PKG_GET_STRLIST( compute_requiredby )
+
+CAMLprim value oalpm_pkg_checkmd5sum ( value package )
+{
+    CAMLparam1( package );
+    OALPMreturn( alpm_pkg_checkmd5sum( Package_val( package )));
+}
+
+

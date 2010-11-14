@@ -11,6 +11,7 @@ class type package =
     method md5sum   : string
     method arch     : string
     method requiredby : string list
+    method checkmd5sum : unit
   end
 
 class type database =

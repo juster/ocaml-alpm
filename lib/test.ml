@@ -23,9 +23,9 @@ let _ =
 
   let localdb = Alpm.new_db "local" in print_endline (localdb#name) ;
   let pkgs = localdb#packages in
-  List.iter (fun pkg -> if pkg#name = "perl" then
-    List.iter (fun name -> print_endline name) pkg#requiredby)
-    pkgs
+  let dump_perl_pkg pkg = pkg#checkmd5sum in
+
+  List.iter (fun pkg -> if pkg#name = "perl" then dump_perl_pkg pkg) pkgs
 
   (* let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in *)
   (* print_endline (perlpkg#name ^ " " ^ perlpkg#version) *)
