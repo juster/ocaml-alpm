@@ -127,12 +127,12 @@ let localdb unit = new database (option_get_localdb ())
 let syncdbs unit =
   List.map (fun rawdb -> new database rawdb) (oalpm_syncdbs ())
 
-(* let db name = *)
-(*   let rec find_db name dblist = *)
-(*     match dblist with *)
-(*       []     -> raise Not_found *)
-(*     | hd::tl -> if (hd#name ()) = name then hd else find_db name tl *)
-(*   in find_db name (syncdbs ()) *)
+let db name =
+  let rec find_db name dblist =
+    match dblist with
+      []     -> raise Not_found
+    | hd::tl -> if hd#name = name then hd else find_db name tl
+  in find_db name (syncdbs ())
 
 (* We must register our exception to allow the C code to use it. *)
 let () =

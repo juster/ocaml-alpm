@@ -85,4 +85,4 @@ val disable_fetchcb : unit -> unit
 val new_db  : string -> database
 val localdb : unit   -> database
 val syncdbs : unit   -> database list
-(* val db      : string -> database *)
+val db      : string -> database
