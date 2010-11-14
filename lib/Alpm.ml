@@ -1,7 +1,7 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
-type database
-type package
-type package_autofree = package
+type alpm_database
+type alpm_package
+type alpm_package_autofree = alpm_package
 
 exception AlpmError of string
 exception NoLocalDB
@@ -9,7 +9,7 @@ exception NoLocalDB
 (* Basic ALPM functions *)
 external init         : unit -> unit = "oalpm_initialize"
 external release      : unit -> unit = "oalpm_release"
-external load_pkgfile : string -> package_autofree = "oalpm_load_pkgfile"
+external oalpm_load_pkgfile : string -> alpm_package = "oalpm_load_pkgfile"
 
 (* Options *)
 
@@ -74,31 +74,63 @@ let enable_fetchcb cb =
   Callback.register "fetch callback" cb ; oalpm_enable_fetch_cb ()
 
 (* Database accessors/mutators *)
-external new_db  : string -> database    = "oalpm_register"
-external localdb : unit -> database      = "oalpm_localdb"
-external syncdbs : unit -> database list = "oalpm_syncdbs"
-
-external db_name  : database -> string    = "oalpm_db_get_name"
-external db_url   : database -> string    = "oalpm_db_get_url"
-external db_addurl : database -> string -> unit = "oalpm_db_add_url"
-external db_packages : database -> package list = "oalpm_db_packages"
+external oalpm_register : string -> alpm_database
+    = "oalpm_register"
+external option_get_localdb : unit -> alpm_database
+    = "oalpm_option_get_localdb"
+external oalpm_syncdbs : unit -> alpm_database list
+    = "oalpm_syncdbs"
 
 (* PACKAGES *)
-external pkg_name : package -> string = "oalpm_pkg_get_name"
-external pkg_filename : package -> string = "oalpm_pkg_get_filename"
-external pkg_version : package -> string = "oalpm_pkg_get_version"
-external pkg_desc : package -> string = "oalpm_pkg_get_desc"
-external pkg_url : package -> string = "oalpm_pkg_get_url"
-external pkg_packager : package -> string = "oalpm_pkg_get_packager"
-external pkg_md5sum : package -> string = "oalpm_pkg_get_md5sum"
-external pkg_arch : package -> string = "oalpm_pkg_get_arch"
+external pkg_name     : alpm_package -> string = "oalpm_pkg_get_name"
+external pkg_filename : alpm_package -> string = "oalpm_pkg_get_filename"
+external pkg_version  : alpm_package -> string = "oalpm_pkg_get_version"
+external pkg_desc     : alpm_package -> string = "oalpm_pkg_get_desc"
+external pkg_url      : alpm_package -> string = "oalpm_pkg_get_url"
+external pkg_packager : alpm_package -> string
+    = "oalpm_pkg_get_packager"
+external pkg_md5sum   : alpm_package -> string = "oalpm_pkg_get_md5sum"
+external pkg_arch     : alpm_package -> string = "oalpm_pkg_get_arch"
 
-let db name =
-  let rec find_db name dblist =
-    match dblist with
-      []     -> raise Not_found
-    | hd::tl -> if (db_name hd) = name then hd else find_db name tl
-  in find_db name (syncdbs ())
+class package pkg_data =
+  object
+    method name     = pkg_name pkg_data
+    method filename = pkg_filename pkg_data
+    method version  = pkg_version pkg_data
+    method desc     = pkg_desc pkg_data
+    method url      = pkg_url pkg_data
+    method packager = pkg_packager pkg_data
+    method md5sum   = pkg_md5sum pkg_data
+    method arch     = pkg_arch pkg_data
+  end
+
+let load_pkgfile path = new package (oalpm_load_pkgfile path)
+
+(* DATABASES *)
+external db_name      : alpm_database -> string    = "oalpm_db_get_name"
+external db_url       : alpm_database -> string    = "oalpm_db_get_url"
+external db_addurl    : alpm_database -> string -> unit = "oalpm_db_add_url"
+external db_packages  : alpm_database -> package list = "oalpm_db_packages"
+
+class database db_data =
+  object
+    method name     = db_name db_data
+    method url      = db_url db_data
+    method addurl url = db_addurl db_data url
+    method packages = db_packages db_data
+  end
+
+let new_db name  = new database (oalpm_register name)
+let localdb unit = new database (option_get_localdb ())
+let syncdbs unit =
+  List.map (fun rawdb -> new database rawdb) (oalpm_syncdbs ())
+
+(* let db name = *)
+(*   let rec find_db name dblist = *)
+(*     match dblist with *)
+(*       []     -> raise Not_found *)
+(*     | hd::tl -> if (hd#name ()) = name then hd else find_db name tl *)
+(*   in find_db name (syncdbs ()) *)
 
 (* We must register our exception to allow the C code to use it. *)
 let () =

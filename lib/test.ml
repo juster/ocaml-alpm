@@ -1,5 +1,3 @@
-open Alpm
-
 let rec print_list list =
   match list with
     []     -> print_endline ""
@@ -16,14 +14,11 @@ let logger level msg =
   print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
 
 let _ =
-  init () ;
-  enable_logcb logger ;
-  set_root "/" ;
-  set_dbpath "/var/lib/pacman" ;
-  add_cachedir "/var/cache/pacman/pkg" ;
-  set_logfile "test.log" ;
-  let perlpkg = load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in
-  print_endline (pkg_name perlpkg)
-
-
-      
+  Alpm.init () ;
+  Alpm.enable_logcb logger ;
+  Alpm.set_root "/" ;
+  Alpm.set_dbpath "/var/lib/pacman" ;
+  Alpm.add_cachedir "/var/cache/pacman/pkg" ;
+  Alpm.set_logfile "test.log" ;
+  let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in
+  print_endline (perlpkg#name ^ " " ^ perlpkg#version)

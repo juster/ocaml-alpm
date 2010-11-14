@@ -45,7 +45,7 @@ CAMLprim value oalpm_register ( value name )
     CAMLreturn( alloc_alpm_db( db ));
 }
 
-CAMLprim value oalpm_localdb ( value unit )
+CAMLprim value oalpm_option_get_localdb ( value unit )
 {
     pmdb_t * db;
 
