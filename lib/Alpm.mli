@@ -1,12 +1,14 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
 type database
 type package
+type package_autofree = package
 
 exception AlpmError of string
 exception NoLocalDB
 
 val init    : unit -> unit
 val release : unit -> unit
+val load_pkgfile : string -> package_autofree
 
 (* OPTIONS *)
 
@@ -75,11 +77,11 @@ val db_addurl   : database -> string -> unit
 val db_packages : database -> package list
 
 (* PACKAGES *)
-val pkg_name : package -> string
+val pkg_name     : package -> string
 val pkg_filename : package -> string
-val pkg_version : package -> string
-val pkg_desc : package -> string
-val pkg_url : package -> string
+val pkg_version  : package -> string
+val pkg_desc     : package -> string
+val pkg_url      : package -> string
 val pkg_packager : package -> string
-val pkg_md5sum : package -> string
-val pkg_arch : package -> string
+val pkg_md5sum   : package -> string
+val pkg_arch     : package -> string

@@ -44,4 +44,8 @@ void * caml_to_alpm_strelem ( value str );
         return custom;                                              \
     }
 
+value alloc_alpm_db  ( pmdb_t * db );
+value alloc_alpm_pkg ( pmpkg_t * pkg );
+value alloc_alpm_pkg_autofree ( pmpkg_t * pkg );
+
 #endif

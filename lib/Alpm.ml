@@ -1,13 +1,15 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
 type database
 type package
+type package_autofree = package
 
 exception AlpmError of string
 exception NoLocalDB
 
 (* Basic ALPM functions *)
-external init    : unit -> unit = "oalpm_initialize"
-external release : unit -> unit = "oalpm_release"
+external init         : unit -> unit = "oalpm_initialize"
+external release      : unit -> unit = "oalpm_release"
+external load_pkgfile : string -> package_autofree = "oalpm_load_pkgfile"
 
 (* Options *)
 

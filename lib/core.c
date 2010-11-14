@@ -63,3 +63,15 @@ CAMLprim value oalpm_syncdbs ( value unit )
     CAMLparam1( unit );
     CAMLreturn( CAML_DB_LIST( alpm_option_get_syncdbs() ));
 }
+
+CAMLprim value oalpm_load_pkgfile ( value path )
+{
+    pmpkg_t * pkg;
+    int ret;
+
+    CAMLparam1( path );
+    ret = alpm_pkg_load( String_val( path ), 1, &pkg );
+    if ( ret != 0 ) raise_alpm_error();
+
+    CAMLreturn( alloc_alpm_pkg_autofree( pkg ));
+}

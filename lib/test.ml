@@ -16,21 +16,14 @@ let logger level msg =
   print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
 
 let _ =
-  Alpm.init () ;
-  Alpm.enable_logcb logger ;
-  Alpm.set_root "/" ;
-  Alpm.set_dbpath "/var/lib/pacman" ;
-  Alpm.add_cachedir "/var/cache/pacman/pkg" ;
-  Alpm.set_logfile "test.log" ;
-
-  print_endline "Cachedirs set:" ;
-  List.iter (fun dir -> print_endline dir) (Alpm.get_cachedirs ()) ;
-
-  let localdb = Alpm.new_db "local" in
-  let pkgs = (Alpm.db_packages localdb) in
-
-  List.iter (fun pkg -> print_endline
-      ((Alpm.pkg_name pkg) ^ " " ^ (Alpm.pkg_version pkg))) pkgs
+  init () ;
+  enable_logcb logger ;
+  set_root "/" ;
+  set_dbpath "/var/lib/pacman" ;
+  add_cachedir "/var/cache/pacman/pkg" ;
+  set_logfile "test.log" ;
+  let perlpkg = load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in
+  print_endline (pkg_name perlpkg)
 
 
       

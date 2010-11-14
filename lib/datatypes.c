@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 
 #include <caml/mlvalues.h>
@@ -15,6 +16,31 @@
 
 CUSTOM_ALPM_TYPE( db, Database )
 CUSTOM_ALPM_TYPE( pkg, Package )
+
+void finalize_autofree_pkg ( value package )
+{
+    fprintf( stderr, "FREEING PACKAGE!\n" );
+    alpm_pkg_free( Package_val( package ));
+    return;
+}
+
+static struct custom_operations alpm_pkg_free_opts = {
+    "org.archlinux.caml.alpm.pkg.autofree",
+    finalize_autofree_pkg,
+    custom_compare_default,
+    custom_hash_default,
+    custom_serialize_default,
+    custom_deserialize_default,
+};
+
+value alloc_alpm_pkg_autofree ( pmpkg_t * pkg )
+{
+    value custom = alloc_custom( &alpm_pkg_free_opts,
+                                 sizeof ( pmpkg_t * ),
+                                 0, 1 );
+    Package_val( custom ) = pkg;
+    return custom;
+}
 
 value alpm_to_caml_list ( alpm_list_t * list, alpm_elem_conv converter )
 {
