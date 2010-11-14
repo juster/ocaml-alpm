@@ -1,8 +1,11 @@
+#include <string.h>
+
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/fail.h>
 #include <caml/callback.h>
 #include <caml/alloc.h>
+
 #include <alpm.h>
 
 #include "core.h"
@@ -32,8 +35,15 @@ OALPM_PKG_GET_STRLIST( get_backup )
 
 CAMLprim value oalpm_pkg_checkmd5sum ( value package )
 {
+    pmpkg_t * pkg;
+    pmdb_t  * db;
     CAMLparam1( package );
-    OALPMreturn( alpm_pkg_checkmd5sum( Package_val( package )));
+    pkg = Package_val( package );
+    db  = alpm_pkg_get_db( pkg );
+    if ( strcmp( alpm_db_get_name( db ), "local" ) == 0 ) {
+        caml_failwith( FAIL_CHECK_LOCALPKG );
+    }
+    OALPMreturn( alpm_pkg_checkmd5sum( pkg ));
 }
 
 CAMLprim value oalpm_pkg_get_db ( value package )
