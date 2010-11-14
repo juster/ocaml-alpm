@@ -20,5 +20,9 @@ let _ =
   Alpm.set_dbpath "/var/lib/pacman" ;
   Alpm.add_cachedir "/var/cache/pacman/pkg" ;
   Alpm.set_logfile "test.log" ;
-  let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in
-  print_endline (perlpkg#name ^ " " ^ perlpkg#version)
+
+  let localdb = Alpm.new_db "local" in print_endline (localdb#name) ;
+  localdb#packages ;
+
+  (* let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in *)
+  (* print_endline (perlpkg#name ^ " " ^ perlpkg#version) *)

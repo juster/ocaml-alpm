@@ -35,7 +35,7 @@ CAMLprim value oalpm_db_add_url ( value db, value url )
                                     String_val( url )));
 }
 
-CAMLprim value oalpm_db_packages ( value db )
+CAMLprim value oalpm_db_get_pkgcache ( value db )
 {
     alpm_list_t * pkg_list;
 

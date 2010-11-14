@@ -110,14 +110,16 @@ let load_pkgfile path = new package (oalpm_load_pkgfile path)
 external db_name      : alpm_database -> string    = "oalpm_db_get_name"
 external db_url       : alpm_database -> string    = "oalpm_db_get_url"
 external db_addurl    : alpm_database -> string -> unit = "oalpm_db_add_url"
-external db_packages  : alpm_database -> package list = "oalpm_db_packages"
+external db_pkgcache  : alpm_database -> alpm_package list
+    = "oalpm_db_get_pkgcache"
 
 class database db_data =
   object
     method name     = db_name db_data
     method url      = db_url db_data
     method addurl url = db_addurl db_data url
-    method packages = db_packages db_data
+    method packages =
+      List.map (fun pkg -> new package pkg) (db_pkgcache db_data)
   end
 
 let new_db name  = new database (oalpm_register name)
