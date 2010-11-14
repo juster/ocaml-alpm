@@ -119,6 +119,10 @@ external pkg_get_db : alpm_package -> alpm_database
     = "oalpm_pkg_get_db"
 external pkg_get_reason : alpm_package -> reason
     = "oalpm_pkg_get_reason"
+external pkg_get_size : alpm_package -> int
+    = "oalpm_pkg_get_size"
+external pkg_get_isize : alpm_package -> int
+    = "oalpm_pkg_get_isize"
 
 (* DATABASES *)
 external db_name      : alpm_database -> string    = "oalpm_db_get_name"
@@ -148,7 +152,12 @@ class package pkg_data =
     method replaces   = pkg_get_replaces pkg_data
     method files      = pkg_get_files pkg_data
     method backup     = pkg_get_backup pkg_data
+
     method reason     = pkg_get_reason pkg_data
+
+    method size       = pkg_get_size pkg_data
+    method isize      = pkg_get_isize pkg_data
+
     method db         = new database (pkg_get_db pkg_data)
   end
 and database db_data =

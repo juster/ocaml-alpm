@@ -24,6 +24,9 @@ class type package =
     method files      : string list
     method backup     : string list
 
+    method size       : int
+    method isize      : int
+
     method reason     : reason
     method db         : database
   end

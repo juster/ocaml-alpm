@@ -1,4 +1,5 @@
 open Alpm
+open Printf
 
 let rec print_list list =
   match list with
@@ -31,6 +32,7 @@ let _ =
                    ( match pkg#reason with
                    |  Explicit -> "explicitly."
                    |  Dependency -> "as a dependency.")) ;
+    printf "Package size is %d\nInstalled size is %d\n" pkg#size pkg#isize ;
     pkg#checkmd5sum ;
   in
 

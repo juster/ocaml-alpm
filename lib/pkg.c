@@ -33,6 +33,9 @@ OALPM_PKG_GET_STRLIST( get_replaces )
 OALPM_PKG_GET_STRLIST( get_files )
 OALPM_PKG_GET_STRLIST( get_backup )
 
+OALPM_PKG_GET_LONG( size )
+OALPM_PKG_GET_LONG( isize )
+
 CAMLprim value oalpm_pkg_checkmd5sum ( value package )
 {
     pmpkg_t * pkg;
@@ -57,3 +60,4 @@ CAMLprim value oalpm_pkg_get_reason ( value package )
     CAMLparam1( package );
     CAMLreturn( Val_int( alpm_pkg_get_reason( Package_val( package ))));
 }
+
