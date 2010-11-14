@@ -20,6 +20,15 @@ OALPM_PKG_GET_STR( md5sum )
 OALPM_PKG_GET_STR( arch )
 
 OALPM_PKG_GET_STRLIST( compute_requiredby )
+OALPM_PKG_GET_STRLIST( get_licenses )
+OALPM_PKG_GET_STRLIST( get_groups )
+OALPM_PKG_GET_STRLIST( get_optdepends )
+OALPM_PKG_GET_STRLIST( get_conflicts )
+OALPM_PKG_GET_STRLIST( get_provides )
+OALPM_PKG_GET_STRLIST( get_deltas )
+OALPM_PKG_GET_STRLIST( get_replaces )
+OALPM_PKG_GET_STRLIST( get_files )
+OALPM_PKG_GET_STRLIST( get_backup )
 
 CAMLprim value oalpm_pkg_checkmd5sum ( value package )
 {

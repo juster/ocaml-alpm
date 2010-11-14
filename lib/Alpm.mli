@@ -10,8 +10,18 @@ class type package =
     method packager : string
     method md5sum   : string
     method arch     : string
-    method requiredby : string list
     method checkmd5sum : unit
+
+    method requiredby : string list
+    method licenses   : string list
+    method groups     : string list
+    method optdepends : string list
+    method conflicts  : string list
+    method provides   : string list
+    method deltas     : string list
+    method replaces   : string list
+    method files      : string list
+    method backup     : string list
   end
 
 class type database =

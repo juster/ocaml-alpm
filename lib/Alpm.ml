@@ -91,8 +91,28 @@ external pkg_packager : alpm_package -> string
     = "oalpm_pkg_get_packager"
 external pkg_md5sum   : alpm_package -> string = "oalpm_pkg_get_md5sum"
 external pkg_arch     : alpm_package -> string = "oalpm_pkg_get_arch"
-external pkg_requiredby : alpm_package -> string list = "oalpm_pkg_compute_requiredby"
 external pkg_checkmd5sum : alpm_package -> unit = "oalpm_pkg_checkmd5sum"
+
+external pkg_requiredby : alpm_package -> string list
+    = "oalpm_pkg_compute_requiredby"
+external pkg_get_licenses : alpm_package -> string list
+    = "oalpm_pkg_get_licenses"
+external pkg_get_groups : alpm_package -> string list
+    = "oalpm_pkg_get_groups"
+external pkg_get_optdepends : alpm_package -> string list
+    = "oalpm_pkg_get_optdepends"
+external pkg_get_conflicts : alpm_package -> string list
+    = "oalpm_pkg_get_conflicts"
+external pkg_get_provides : alpm_package -> string list
+    = "oalpm_pkg_get_provides"
+external pkg_get_deltas : alpm_package -> string list
+    = "oalpm_pkg_get_deltas"
+external pkg_get_replaces : alpm_package -> string list
+    = "oalpm_pkg_get_replaces"
+external pkg_get_files : alpm_package -> string list
+    = "oalpm_pkg_get_files"
+external pkg_get_backup : alpm_package -> string list
+    = "oalpm_pkg_get_backup"
 
 class package pkg_data =
   object
@@ -104,8 +124,18 @@ class package pkg_data =
     method packager = pkg_packager pkg_data
     method md5sum   = pkg_md5sum pkg_data
     method arch     = pkg_arch pkg_data
-    method requiredby = pkg_requiredby pkg_data
     method checkmd5sum = pkg_checkmd5sum pkg_data
+
+    method requiredby = pkg_requiredby pkg_data
+    method licenses   = pkg_get_licenses pkg_data
+    method groups     = pkg_get_groups pkg_data
+    method optdepends = pkg_get_optdepends pkg_data
+    method conflicts  = pkg_get_conflicts pkg_data
+    method provides   = pkg_get_provides pkg_data
+    method deltas     = pkg_get_deltas pkg_data
+    method replaces   = pkg_get_replaces pkg_data
+    method files      = pkg_get_files pkg_data
+    method backup     = pkg_get_backup pkg_data
   end
 
 let load_pkgfile path = new package (oalpm_load_pkgfile path)
