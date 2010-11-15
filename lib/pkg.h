@@ -30,4 +30,13 @@
         CAMLreturn( Val_long( alpm_pkg_get_ ## NAME ( pkg )));          \
     }
 
+#define OALPM_PKG_HAS_BOOL( NAME )                              \
+    CAMLprim value oalpm_pkg_has_ ## NAME ( value package )     \
+    {                                                           \
+        pmpkg_t * pkg;                                          \
+        CAMLparam1( package );                                  \
+        pkg = Package_val( package );                           \
+        CAMLreturn( Val_bool( alpm_pkg_has_ ## NAME ( pkg )));   \
+    }
+
 #endif

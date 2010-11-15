@@ -33,10 +33,15 @@ let _ =
                    |  Explicit -> "explicitly."
                    |  Dependency -> "as a dependency.")) ;
     printf "Package size is %d\nInstalled size is %d\n" pkg#size pkg#isize ;
-    pkg#checkmd5sum ;
+    printf "Forced is %s\nScriptlet is %s\n"
+      (string_of_bool pkg#forced) (string_of_bool pkg#scriptlet) ;
+      
+    try
+      pkg#checkmd5sum ;
+    with Failure(str) -> print_endline "Checkmd5sum failed properly." ;
   in
 
-  (* List.iter (fun pkg -> if pkg#name = "perl" then dump_perl_pkg pkg) pkgs ; *)
+  List.iter (fun pkg -> if pkg#name = "perl" then dump_perl_pkg pkg) pkgs ;
   let vercmp_msg foo bar =
     match vercmp foo bar with
     | Less -> "less than"

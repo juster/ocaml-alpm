@@ -36,6 +36,9 @@ OALPM_PKG_GET_STRLIST( get_backup )
 OALPM_PKG_GET_LONG( size )
 OALPM_PKG_GET_LONG( isize )
 
+OALPM_PKG_HAS_BOOL( scriptlet )
+OALPM_PKG_HAS_BOOL( force )
+
 CAMLprim value oalpm_pkg_checkmd5sum ( value package )
 {
     pmpkg_t * pkg;

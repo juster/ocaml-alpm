@@ -28,6 +28,9 @@ class type package =
     method size       : int
     method isize      : int
 
+    method scriptlet  : bool
+    method forced     : bool
+
     method reason     : reason
     method db         : database
   end
