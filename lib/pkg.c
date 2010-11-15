@@ -33,8 +33,9 @@ OALPM_PKG_GET_STRLIST( get_replaces )
 OALPM_PKG_GET_STRLIST( get_files )
 OALPM_PKG_GET_STRLIST( get_backup )
 
-OALPM_PKG_GET_LONG( size )
-OALPM_PKG_GET_LONG( isize )
+OALPM_PKG_LONG( download_size )
+OALPM_PKG_LONG( get_size )
+OALPM_PKG_LONG( get_isize )
 
 OALPM_PKG_HAS_BOOL( scriptlet )
 OALPM_PKG_HAS_BOOL( force )

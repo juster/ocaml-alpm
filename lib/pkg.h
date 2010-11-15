@@ -21,13 +21,13 @@
         CAMLreturn( list );                                     \
     }
 
-#define OALPM_PKG_GET_LONG( NAME )                                      \
-    CAMLprim value oalpm_pkg_get_ ## NAME ( value package )             \
+#define OALPM_PKG_LONG( NAME )                                          \
+    CAMLprim value oalpm_pkg_ ## NAME ( value package )                 \
     {                                                                   \
         pmpkg_t * pkg;                                                  \
         CAMLparam1( package );                                          \
         pkg = Package_val( package );                                   \
-        CAMLreturn( Val_long( alpm_pkg_get_ ## NAME ( pkg )));          \
+        CAMLreturn( Val_long( alpm_pkg_ ## NAME ( pkg )));              \
     }
 
 #define OALPM_PKG_HAS_BOOL( NAME )                              \

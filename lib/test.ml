@@ -33,8 +33,11 @@ let _ =
                    |  Explicit -> "explicitly."
                    |  Dependency -> "as a dependency.")) ;
     printf "Package size is %d\nInstalled size is %d\n" pkg#size pkg#isize ;
+    printf "Download size is %d\n" pkg#download_size ;
+
     printf "Forced is %s\nScriptlet is %s\n"
       (string_of_bool pkg#forced) (string_of_bool pkg#scriptlet) ;
+
       
     try
       pkg#checkmd5sum ;

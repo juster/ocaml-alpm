@@ -126,6 +126,8 @@ external pkg_get_size : alpm_package -> int
     = "oalpm_pkg_get_size"
 external pkg_get_isize : alpm_package -> int
     = "oalpm_pkg_get_isize"
+external pkg_download_size : alpm_package -> int
+    = "oalpm_pkg_download_size"
 external pkg_has_scriptlet : alpm_package -> bool
     = "oalpm_pkg_has_scriptlet"
 external pkg_has_force : alpm_package -> bool
@@ -162,8 +164,9 @@ class package pkg_data =
 
     method reason     = pkg_get_reason pkg_data
 
-    method size       = pkg_get_size pkg_data
-    method isize      = pkg_get_isize pkg_data
+    method size          = pkg_get_size pkg_data
+    method isize         = pkg_get_isize pkg_data
+    method download_size = pkg_download_size pkg_data
 
     method scriptlet  = pkg_has_scriptlet pkg_data
     method forced     = pkg_has_force pkg_data
