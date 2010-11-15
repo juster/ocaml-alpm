@@ -1,5 +1,6 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
-type reason = Explicit | Dependency
+type reason    = Explicit | Dependency
+type compare   = Less | Equal | Greater
 
 class type package =
   object
@@ -104,3 +105,5 @@ val new_db  : string -> database
 val localdb : unit   -> database
 val syncdbs : unit   -> database list
 val db      : string -> database
+
+val vercmp : string -> string -> compare

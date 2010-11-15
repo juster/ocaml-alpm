@@ -3,6 +3,8 @@
 #include <caml/fail.h>
 #include <caml/callback.h>
 #include <caml/alloc.h>
+
+#include <stdio.h>
 #include <string.h>
 #include <alpm.h>
 
@@ -74,4 +76,13 @@ CAMLprim value oalpm_load_pkgfile ( value path )
     if ( ret != 0 ) raise_alpm_error();
 
     CAMLreturn( alloc_alpm_pkg_autofree( pkg ));
+}
+
+CAMLprim value oalpm_pkg_vercmp ( value left, value right )
+{
+    int cmp;
+    CAMLparam2( left, right );
+    cmp = alpm_pkg_vercmp( String_val( left ), String_val( right ));
+    ++cmp;
+    CAMLreturn( Val_int( cmp ));
 }

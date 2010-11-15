@@ -1,5 +1,6 @@
 type log_level = LogError | LogWarning | LogDebug | LogFunction
-type reason = Explicit | Dependency
+type reason    = Explicit | Dependency
+type compare   = Less | Equal | Greater
 
 type alpm_database
 type alpm_package
@@ -12,6 +13,8 @@ exception NoLocalDB
 external init         : unit -> unit = "oalpm_initialize"
 external release      : unit -> unit = "oalpm_release"
 external oalpm_load_pkgfile : string -> alpm_package = "oalpm_load_pkgfile"
+external vercmp       : string -> string -> compare
+    = "oalpm_pkg_vercmp"
 
 (* Options *)
 
@@ -171,8 +174,6 @@ and database db_data =
 
 
 let load_pkgfile path = new package (oalpm_load_pkgfile path)
-
-
 let new_db name  = new database (oalpm_register name)
 let localdb unit = new database (option_get_localdb ())
 let syncdbs unit =

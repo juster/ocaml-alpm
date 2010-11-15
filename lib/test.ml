@@ -36,7 +36,22 @@ let _ =
     pkg#checkmd5sum ;
   in
 
-  List.iter (fun pkg -> if pkg#name = "perl" then dump_perl_pkg pkg) pkgs
+  (* List.iter (fun pkg -> if pkg#name = "perl" then dump_perl_pkg pkg) pkgs ; *)
+  let vercmp_msg foo bar =
+    match vercmp foo bar with
+    | Less -> "less than"
+    | Equal -> "equal to"
+    | Greater -> "greater than"
+  in
 
+  let test_vercmp foo bar =
+    printf "%s is %s %s\n" foo (vercmp_msg foo bar) bar
+  in
+  test_vercmp "1.9" "1.1" ;
+  test_vercmp "1.001" "1.1";
+  test_vercmp "1.001" "1.0001";
+  test_vercmp "1.001001" "1.1001";
+  test_vercmp "1.1234" "1.2345"
+    
   (* let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in *)
   (* print_endline (perlpkg#name ^ " " ^ perlpkg#version) *)
