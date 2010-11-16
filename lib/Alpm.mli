@@ -6,6 +6,7 @@ type compare   = Less | Equal | Greater
 
 (** The modifier for a package/version dependency. *)
 type dependency_modifier = 
+  | Any     (** When there is only the package name. *)
   | Exactly (** == *)
   | Above   (** <  *)
   | Below   (** >  *)
@@ -61,6 +62,7 @@ class type package =
     method forced     : bool
 
     method reason     : reason
+    method deps       : dependency list
     method db         : database
   end
 and database =

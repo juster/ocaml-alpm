@@ -1,12 +1,21 @@
 #ifndef _OALPM_DATATYPES_H
 #define _OALPM_DATATYPES_H
 
+/* copied from libalpm's deps.h */
+/* Dependency */
+struct __pmdepend_t {
+	pmdepmod_t mod;
+	char *name;
+	char *version;
+};
+
 /* List conversion */
 typedef value (*alpm_elem_conv)( void * );
 value alpm_to_caml_list ( alpm_list_t *list, alpm_elem_conv converter );
 value alpm_to_caml_strelem ( void * elem );
 value alpm_to_caml_dbelem ( void * elem );
 value alpm_to_caml_pkgelem ( void * elem );
+value alpm_to_caml_dependency( void * elem );
 
 typedef void * (*caml_elem_conv)( value );
 alpm_list_t * caml_to_alpm_list ( value list, caml_elem_conv converter );
@@ -15,6 +24,8 @@ void * caml_to_alpm_strelem ( value str );
 #define CAML_STR_LIST( LIST ) alpm_to_caml_list( LIST, alpm_to_caml_strelem )
 #define CAML_DB_LIST( LIST )  alpm_to_caml_list( LIST, alpm_to_caml_dbelem  )
 #define CAML_PKG_LIST( LIST ) alpm_to_caml_list( LIST, alpm_to_caml_pkgelem )
+#define CAML_DEP_LIST( LIST ) \
+    alpm_to_caml_list( LIST, alpm_to_caml_dependency )
 
 #define ALPM_STR_LIST( LIST ) \
     caml_to_alpm_list( LIST, caml_to_alpm_strelem )
@@ -47,5 +58,10 @@ void * caml_to_alpm_strelem ( value str );
 value alloc_alpm_db  ( pmdb_t * db );
 value alloc_alpm_pkg ( pmpkg_t * pkg );
 value alloc_alpm_pkg_autofree ( pmpkg_t * pkg );
+
+/* Other user-defined types */
+
+value caml_copy_depmod ( pmdepmod_t depmod );
+value caml_copy_dependency ( pmdepend_t * dep );
 
 #endif

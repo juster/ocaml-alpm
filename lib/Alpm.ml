@@ -8,7 +8,8 @@ type alpm_database
 type alpm_package
 type alpm_package_autofree = alpm_package
 
-type dependency_modifier = 
+type dependency_modifier =
+  | Any     (** When there is only the package name. *)
   | Exactly (** == *)
   | Above   (** <  *)
   | Below   (** >  *)
@@ -23,6 +24,7 @@ module Dep =
   struct
     let string_of_depmod modifier =
       match modifier with
+      | Any     -> ""
       | Exactly -> "=="
       | AtLeast -> ">="
       | AtMost  -> "<="
@@ -30,6 +32,7 @@ module Dep =
       | Below   -> "<"
     let depmod_of_string depmod =
       match depmod with
+      | ""   -> Any (* this is a little funky ... *)
       | "==" -> Exactly
       | ">=" -> AtLeast
       | "<=" -> AtMost
@@ -37,7 +40,8 @@ module Dep =
       | "<"  -> Below
       | _    -> raise (Failure "Invalid dependency string")
     let string_of_dep dep =
-      if dep.version = "0" && dep.modifier = AtLeast then
+      if dep.modifier = Any
+         || (dep.version = "0" && dep.modifier = AtLeast) then
         dep.package
       else
         dep.package ^ (string_of_depmod dep.modifier) ^ dep.version
@@ -46,7 +50,7 @@ module Dep =
                               "\\(.+\\)\\(==\\|<\\|>\\|<=\\|>=\\)\\(.+\\)")
                 depstr 0)
       then
-        { package = depstr; modifier = AtLeast; version = "0"; }
+        { package = depstr; modifier = Any; version = ""; }
       else
         { package  = (matched_group 1 depstr);
           modifier = (depmod_of_string (matched_group 2 depstr));
@@ -183,6 +187,8 @@ external pkg_has_scriptlet : alpm_package -> bool
     = "oalpm_pkg_has_scriptlet"
 external pkg_has_force : alpm_package -> bool
     = "oalpm_pkg_has_force"
+external pkg_get_depends : alpm_package -> dependency list
+    = "oalpm_pkg_get_depends"
 
 (* DATABASES *)
 external db_name      : alpm_database -> string    = "oalpm_db_get_name"
@@ -225,6 +231,7 @@ class package pkg_data =
     method scriptlet  = pkg_has_scriptlet pkg_data
     method forced     = pkg_has_force pkg_data
 
+    method deps       = pkg_get_depends pkg_data
     method db         = new database (pkg_get_db pkg_data)
   end
 and database db_data =

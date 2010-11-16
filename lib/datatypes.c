@@ -65,6 +65,12 @@ value alpm_to_caml_strelem ( void * elem )
     CAMLreturn( caml_copy_string( (char *) elem ));
 }
 
+value alpm_to_caml_dependency ( void * elem )
+{
+    CAMLparam0();
+    CAMLreturn( caml_copy_dependency( (pmdepend_t *) elem ));
+}
+
 static alpm_list_t * build_alpm_list ( value list,
                                        caml_elem_conv converter,
                                        alpm_list_t **last )
@@ -127,3 +133,33 @@ void * caml_to_alpm_strelem ( value str )
     return (void *) alpm_str;
 }
 
+value caml_copy_depmod ( pmdepmod_t depmod )
+{
+    int idx;
+    CAMLparam0();
+    CAMLlocal1( camldepmod );
+
+    if ( depmod > 6 ) {
+        caml_failwith( "Unrecognized depmod data-type" );
+    }
+    idx = depmod - 1;
+
+    camldepmod = Val_int( idx );
+    CAMLreturn( camldepmod );
+}
+
+value caml_copy_dependency ( pmdepend_t * dep )
+{
+    CAMLparam0();
+    CAMLlocal1( camldep );
+    camldep = caml_alloc( 3, 0 );
+    Store_field( camldep, 0, caml_copy_string( dep->name ));
+    Store_field( camldep, 1, caml_copy_depmod( dep->mod ));
+    if ( dep->mod == PM_DEP_MOD_ANY ) {
+        Store_field( camldep, 2, caml_copy_string( "" ));
+    }
+    else {
+        Store_field( camldep, 2, caml_copy_string( dep->version ));
+    }
+    CAMLreturn( camldep );
+}

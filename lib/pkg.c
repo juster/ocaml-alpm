@@ -68,3 +68,4 @@ CAMLprim value oalpm_pkg_get_reason ( value package )
     CAMLreturn( Val_int( alpm_pkg_get_reason( Package_val( package ))));
 }
 
+OALPM_PKG_ACCESSOR( get_depends, CAML_DEP_LIST )

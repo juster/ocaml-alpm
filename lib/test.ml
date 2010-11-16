@@ -49,6 +49,9 @@ let _ =
     printf "Forced is %s\nScriptlet is %s\n"
       (string_of_bool pkg#forced) (string_of_bool pkg#scriptlet) ;
 
+    List.iter (fun dep -> print_endline (string_of_dep dep ))
+      pkg#deps ;
+
     try
       pkg#checkmd5sum ;
     with Failure(str) -> print_endline "Checkmd5sum failed properly." ;
