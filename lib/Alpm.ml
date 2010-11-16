@@ -1,3 +1,5 @@
+open Str
+
 type log_level = LogError | LogWarning | LogDebug | LogFunction
 type reason    = Explicit | Dependency
 type compare   = Less | Equal | Greater
@@ -5,6 +7,51 @@ type compare   = Less | Equal | Greater
 type alpm_database
 type alpm_package
 type alpm_package_autofree = alpm_package
+
+type dependency_modifier = 
+  | Exactly (** == *)
+  | Above   (** <  *)
+  | Below   (** >  *)
+  | AtLeast (** >= *)
+  | AtMost  (** <= *)
+
+type dependency = { package  : string;
+                    modifier : dependency_modifier;
+                    version  : string; }
+
+module Dep =
+  struct
+    let string_of_depmod modifier =
+      match modifier with
+      | Exactly -> "=="
+      | AtLeast -> ">="
+      | AtMost  -> "<="
+      | Above   -> ">"
+      | Below   -> "<"
+    let depmod_of_string depmod =
+      match depmod with
+      | "==" -> Exactly
+      | ">=" -> AtLeast
+      | "<=" -> AtMost
+      | ">"  -> Above
+      | "<"  -> Below
+      | _    -> raise (Failure "Invalid dependency string")
+    let string_of_dep dep =
+      if dep.version = "0" && dep.modifier = AtLeast then
+        dep.package
+      else
+        dep.package ^ (string_of_depmod dep.modifier) ^ dep.version
+    let dep_of_string depstr =
+      if not (string_match (regexp
+                              "\\(.+\\)\\(==\\|<\\|>\\|<=\\|>=\\)\\(.+\\)")
+                depstr 0)
+      then
+        { package = depstr; modifier = AtLeast; version = "0"; }
+      else
+        { package  = (matched_group 1 depstr);
+          modifier = (depmod_of_string (matched_group 2 depstr));
+          version  = (matched_group 3 depstr); }
+  end
 
 exception AlpmError of string
 exception NoLocalDB

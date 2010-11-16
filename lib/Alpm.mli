@@ -1,6 +1,31 @@
+(** OCAML library for the ArchLinux Package Manager. *)
+
 type log_level = LogError | LogWarning | LogDebug | LogFunction
 type reason    = Explicit | Dependency
 type compare   = Less | Equal | Greater
+
+(** The modifier for a package/version dependency. *)
+type dependency_modifier = 
+  | Exactly (** == *)
+  | Above   (** <  *)
+  | Below   (** >  *)
+  | AtLeast (** >= *)
+  | AtMost  (** <= *)
+
+(** A package dependency describing the necessary version of
+    a package required by another package. *)
+type dependency = { package  : string;
+                    modifier : dependency_modifier;
+                    version  : string; }
+
+(** A module for dependency functions. *)
+module Dep:
+    sig
+      val string_of_depmod: dependency_modifier -> string
+      val depmod_of_string: string -> dependency_modifier
+      val string_of_dep: dependency -> string
+      val dep_of_string: string -> dependency
+    end
 
 class type package =
   object
