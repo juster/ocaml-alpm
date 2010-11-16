@@ -29,6 +29,9 @@ class type package =
     method isize      : int
     method download_size : int
 
+    method builddate   : float
+    method installdate : float
+
     method scriptlet  : bool
     method forced     : bool
 

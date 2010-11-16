@@ -1,5 +1,6 @@
 open Alpm
 open Printf
+open Unix
 
 let rec print_list list =
   match list with
@@ -24,6 +25,12 @@ let _ =
   Alpm.add_cachedir "/var/cache/pacman/pkg" ;
   Alpm.set_logfile "test.log" ;
 
+  let time_str secs =
+    let t = Unix.localtime secs in
+    sprintf "%d:%d %d/%d/%d" t.tm_hour t.tm_min (t.tm_mon + 1)
+      t.tm_mday (t.tm_year + 1900)
+  in
+  
   let localdb = Alpm.new_db "local" in print_endline (localdb#name) ;
   let pkgs = localdb#packages in
   let dump_perl_pkg pkg =
@@ -35,10 +42,12 @@ let _ =
     printf "Package size is %d\nInstalled size is %d\n" pkg#size pkg#isize ;
     printf "Download size is %d\n" pkg#download_size ;
 
+    printf "Build date is %s\n" (time_str pkg#builddate) ;
+    printf "Install date is %s\n" (time_str pkg#installdate) ;
+
     printf "Forced is %s\nScriptlet is %s\n"
       (string_of_bool pkg#forced) (string_of_bool pkg#scriptlet) ;
 
-      
     try
       pkg#checkmd5sum ;
     with Failure(str) -> print_endline "Checkmd5sum failed properly." ;

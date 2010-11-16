@@ -37,6 +37,9 @@ OALPM_PKG_LONG( download_size )
 OALPM_PKG_LONG( get_size )
 OALPM_PKG_LONG( get_isize )
 
+OALPM_PKG_FLOAT( get_builddate )
+OALPM_PKG_FLOAT( get_installdate )
+
 OALPM_PKG_HAS_BOOL( scriptlet )
 OALPM_PKG_HAS_BOOL( force )
 
