@@ -71,6 +71,7 @@ and database =
     method url      : string
     method addurl   : string -> unit
     method packages : package list
+    method update   : bool -> unit
   end
 
 exception AlpmError of string

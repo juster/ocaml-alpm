@@ -43,3 +43,14 @@ CAMLprim value oalpm_db_get_pkgcache ( value db )
     pkg_list = alpm_db_get_pkgcache( Database_val( db ));
     CAMLreturn( CAML_PKG_LIST( pkg_list ));
 }
+
+CAMLprim value oalpm_db_update ( value force, value db )
+{
+    int ret;
+    CAMLparam2( force, db );
+    ret = alpm_db_update( Bool_val( force ), Database_val( db ));
+    if ( ret > 0 ) {
+        raise_alpm_error();
+    }
+    CAMLreturn( Val_unit );
+}

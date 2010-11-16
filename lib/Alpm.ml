@@ -196,6 +196,8 @@ external db_url       : alpm_database -> string    = "oalpm_db_get_url"
 external db_addurl    : alpm_database -> string -> unit = "oalpm_db_add_url"
 external db_pkgcache  : alpm_database -> alpm_package list
     = "oalpm_db_get_pkgcache"
+external db_update    : bool -> alpm_database -> unit
+    = "oalpm_db_update"
 
 class package pkg_data =
   object(self)
@@ -241,6 +243,7 @@ and database db_data =
     method addurl url = db_addurl db_data url
     method packages =
       List.map (fun pkg -> new package pkg) (db_pkgcache db_data)
+    method update force = db_update force db_data
   end
 
 
