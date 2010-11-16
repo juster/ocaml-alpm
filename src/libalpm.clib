@@ -1,0 +1,13 @@
+callbacks.o
+callbacks.h
+core.o
+core.h
+datatypes.o
+datatypes.h
+db.o
+db.h
+opts.o
+opts.h
+pkg.o
+pkg.h
+errors.h

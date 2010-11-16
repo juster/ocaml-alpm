@@ -2,6 +2,8 @@
 .*
 \#*\#
 *.o
-*.cma
-*.cmi
-*.cmo
+*.cm*
+*.native
+*.byte
+_build
+*.pkg.tar.xz
