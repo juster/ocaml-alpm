@@ -93,3 +93,15 @@ let _ =
 
   print_endline "\n#find:" ;
   print_endline (localdb#find "clyde-git")#name ;
+
+  print_endline "\n#set_pkg_reason:" ;
+  localdb#set_pkg_reason "perl" Explicit;
+  print_endline
+    ("perl package is installed " ^
+     (match (localdb#find "perl")#reason with
+     | Explicit   -> "explicitly"
+     | Dependency -> "as a dependency")) ;
+
+  try localdb#find "this-package-does-not-exist" ; ()
+  with Not_found -> () ;
+        

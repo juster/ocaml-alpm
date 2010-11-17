@@ -76,6 +76,7 @@ and database =
     method search   : string list -> package list
     method groups   : package_group list
     method find_group : string -> package_group
+    method set_pkg_reason : string -> reason -> unit
   end
 and package_group =
   object

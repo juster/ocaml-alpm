@@ -206,6 +206,8 @@ external db_get_grpcache : alpm_database -> ( string * alpm_package list ) list
     = "oalpm_db_get_grpcache"
 external db_readgrp : alpm_database -> string -> ( string * alpm_package list )
     = "oalpm_db_readgrp"
+external db_set_pkgreason : alpm_database -> string -> reason -> unit
+    = "oalpm_db_set_pkgreason"
 
 class package pkg_data =
   object(self)
@@ -216,7 +218,7 @@ class package pkg_data =
     method url      = pkg_url pkg_data
     method packager = pkg_packager pkg_data
     method md5sum   = pkg_md5sum pkg_data
-    method arch     = pkg_arch pkg_data
+    method arch     = pkg_arch pkg_data (**)
     method checkmd5sum = pkg_checkmd5sum pkg_data
     method requiredby = pkg_requiredby pkg_data
     method licenses   = pkg_get_licenses pkg_data
@@ -259,6 +261,8 @@ and database db_data =
       List.map (fun grp_pair -> new package_group grp_pair)
         (db_get_grpcache db_data)
     method find_group name = new package_group (db_readgrp db_data name)
+    method set_pkg_reason name pkgreason =
+      db_set_pkgreason db_data name pkgreason
   end
 and package_group group_tuple =
   object

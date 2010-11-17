@@ -104,3 +104,13 @@ CAMLprim value oalpm_db_get_grpcache ( value db )
     alpm_db = Database_val( db );
     CAMLreturn( CAML_GRP_LIST( alpm_db_get_grpcache( alpm_db )));
 }
+
+CAMLprim value oalpm_db_set_pkgreason ( value db, value pkgname,
+                                        value pkgreason )
+{
+    CAMLparam3( db, pkgname, pkgreason );
+
+    OALPMreturn( alpm_db_set_pkgreason( Database_val( db ),
+                                        String_val( pkgname ),
+                                        Int_val( pkgreason )));
+}
