@@ -10,16 +10,25 @@ let _ =
         (* Test program doesn't link with oalpm funcs without this. *)
         ocaml_lib "libalpm" ;
 
-        (* If a target has the use_libalpm flag then alpm.a is
+        (* If a target has the use_libalpm flag then libalpm.a is
            a dependency of that target. *)
         dep [ "ocaml" ; "link" ; "use_libalpm" ] [ "libalpm.a" ] ;
 
-        (* Add the -lalpm linker flag when compiling libalpm.a so it
-           is automatically used whenever the library is linked to. *)
+        let link_specs = S [ A "-cclib" ; A "-lalpm" ;
+                             (S (List.map (fun x -> A x) oalpm_stub_libs)) ]
+        in
 
-        (* We must also add the C .o object files for some odd reason. *)
-        flag [ "ocaml" ; "link" ; "library" ]
-          ( S ( [ A "-cclib" ; A "-lalpm" ]
-               @ (List.map (fun x -> A x) oalpm_stub_libs) ) )
+        (* Add the -lalpm linker flag and .o object files to the
+           command when compiling libalpm.a so it is automatically used
+           when the libalpm.a library is linked/created. *)
+
+        flag [ "native" ; "ocaml" ; "link" ; "library" ]
+          link_specs ;
+
+        (* Use the link specs when linking our executable for
+           byte-compiling *)
+        flag [ "byte" ; "program" ; "ocaml" ; "link" ; "use_libalpm" ]
+          (S [ A "-custom" ; link_specs ]) ;
+
     | _ -> ()
   end
