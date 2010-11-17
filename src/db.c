@@ -77,7 +77,7 @@ CAMLprim value oalpm_db_readgrp ( value db, value group_name )
     alpm_grp = alpm_db_readgrp( alpm_db, String_val( group_name ));
 
     if ( alpm_grp == NULL ) {
-        caml_failwith( "Group not found" );
+        caml_raise_constant( *caml_named_value( "Not_found" ));
     }
 
     CAMLreturn( caml_copy_group( alpm_grp ));

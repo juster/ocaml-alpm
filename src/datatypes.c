@@ -146,7 +146,7 @@ value caml_copy_depmod ( pmdepmod_t depmod )
     CAMLlocal1( camldepmod );
 
     if ( depmod > 6 ) {
-        caml_failwith( "Unrecognized depmod data-type" );
+        caml_invalid_argument( "Unrecognized depmod data-type" );
     }
     idx = depmod - 1;
 

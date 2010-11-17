@@ -54,7 +54,7 @@ CAMLprim value oalpm_option_get_localdb ( value unit )
     CAMLparam1( unit );
     db = alpm_option_get_localdb();
     if ( db == NULL ) {
-        caml_raise_constant( *caml_named_value( "NoLocalDB" ));
+        caml_raise_constant( *caml_named_value( "Not_found" ));
     }
 
     CAMLreturn( alloc_alpm_db( db ));

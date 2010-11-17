@@ -281,4 +281,4 @@ let db name =
 (* We must register our exception to allow the C code to use it. *)
 let () =
   Callback.register_exception "AlpmError" (AlpmError "any string") ;
-  Callback.register_exception "NoLocalDB" (NoLocalDB)
+  Callback.register_exception "Not_found" (Not_found) ;
