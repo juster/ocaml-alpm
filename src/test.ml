@@ -76,9 +76,10 @@ let _ =
 
   print_endline (string_of_dep { package = "pacman";
                                  modifier = Below;
-                                 version = "2.5" });
+                                 version = "2.5" }) ;
 
-
-    
+  (List.iter (fun pkg -> print_endline pkg#name )
+     (localdb#search [ "perl" ])) ;
+  
   (* let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in *)
   (* print_endline (perlpkg#name ^ " " ^ perlpkg#version) *)

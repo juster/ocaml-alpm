@@ -54,3 +54,15 @@ CAMLprim value oalpm_db_update ( value force, value db )
     }
     CAMLreturn( Val_unit );
 }
+
+CAMLprim value oalpm_db_search ( value db, value keywords )
+{
+    alpm_list_t * alpm_keywords;
+    pmdb_t * alpm_db;
+
+    alpm_keywords = ALPM_STR_LIST( keywords );
+    alpm_db = Database_val( db );
+
+    CAMLparam2( db, keywords );
+    CAMLreturn( CAML_PKG_LIST( alpm_db_search( alpm_db, alpm_keywords )));
+}
