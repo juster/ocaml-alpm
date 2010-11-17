@@ -66,3 +66,12 @@ CAMLprim value oalpm_db_search ( value db, value keywords )
     CAMLparam2( db, keywords );
     CAMLreturn( CAML_PKG_LIST( alpm_db_search( alpm_db, alpm_keywords )));
 }
+
+CAMLprim value oalpm_db_get_grpcache ( value db )
+{
+    pmdb_t * alpm_db;
+
+    CAMLparam1( db );
+    alpm_db = Database_val( db );
+    CAMLreturn( CAML_GRP_LIST( alpm_db_get_grpcache( alpm_db )));
+}

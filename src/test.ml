@@ -80,6 +80,9 @@ let _ =
 
   (List.iter (fun pkg -> print_endline pkg#name )
      (localdb#search [ "perl" ])) ;
+
+  List.iter (fun grp ->
+    List.iter (fun pkg -> print_endline (grp#name ^ " " ^ pkg#name))
+      grp#packages)
+    localdb#groups ;
   
-  (* let perlpkg = Alpm.load_pkgfile "perl-5.12.0-0-i686.pkg.tar.xz" in *)
-  (* print_endline (perlpkg#name ^ " " ^ perlpkg#version) *)

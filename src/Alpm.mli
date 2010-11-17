@@ -73,6 +73,12 @@ and database =
     method packages : package list
     method update   : bool -> unit
     method search   : string list -> package list
+    method groups   : package_group list
+  end
+and package_group =
+  object
+    method name     : string
+    method packages : package list
   end
 
 exception AlpmError of string

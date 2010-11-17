@@ -200,6 +200,8 @@ external db_update    : bool -> alpm_database -> unit
     = "oalpm_db_update"
 external db_search    : alpm_database -> string list -> alpm_package list
     = "oalpm_db_search"
+external db_get_grpcache : alpm_database -> ( string * alpm_package list ) list
+    = "oalpm_db_get_grpcache"
 
 class package pkg_data =
   object(self)
@@ -248,8 +250,17 @@ and database db_data =
     method update force    = db_update force db_data
     method search keywords =
       List.map (fun pkg -> new package pkg) (db_search db_data keywords)
+    method groups          =
+      List.map (fun grp_pair -> new package_group grp_pair)
+        (db_get_grpcache db_data)
   end
-
+and package_group group_tuple =
+  object
+    val pkgobj_list = List.map (fun pkg -> new package pkg)
+        (snd group_tuple)
+    method name     = (fst group_tuple :string )
+    method packages = pkgobj_list
+  end
 
 let load_pkgfile path = new package (oalpm_load_pkgfile path)
 let new_db name  = new database (oalpm_register name)

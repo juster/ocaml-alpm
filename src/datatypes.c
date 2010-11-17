@@ -71,6 +71,12 @@ value alpm_to_caml_dependency ( void * elem )
     CAMLreturn( caml_copy_dependency( (pmdepend_t *) elem ));
 }
 
+value alpm_to_caml_grpelem ( void * elem )
+{
+    CAMLparam0();
+    CAMLreturn( caml_copy_group( (pmgrp_t *) elem ));
+}
+
 static alpm_list_t * build_alpm_list ( value list,
                                        caml_elem_conv converter,
                                        alpm_list_t **last )
@@ -162,4 +168,15 @@ value caml_copy_dependency ( pmdepend_t * dep )
         Store_field( camldep, 2, caml_copy_string( dep->version ));
     }
     CAMLreturn( camldep );
+}
+
+value caml_copy_group ( pmgrp_t * group )
+{
+    CAMLparam0();
+    CAMLlocal1( camlgroup );
+
+    camlgroup = caml_alloc( 2, 0 );
+    Store_field( camlgroup, 0, caml_copy_string( group->name ));
+    Store_field( camlgroup, 1, CAML_PKG_LIST( group->packages ));
+    CAMLreturn( camlgroup );
 }

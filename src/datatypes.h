@@ -9,6 +9,14 @@ struct __pmdepend_t {
 	char *version;
 };
 
+/* copied from groups.h */
+struct __pmgrp_t {
+	/** group name */
+	char *name;
+	/** list of pmpkg_t packages */
+	alpm_list_t *packages;
+};
+
 /* List conversion */
 typedef value (*alpm_elem_conv)( void * );
 value alpm_to_caml_list ( alpm_list_t *list, alpm_elem_conv converter );
@@ -16,6 +24,7 @@ value alpm_to_caml_strelem ( void * elem );
 value alpm_to_caml_dbelem ( void * elem );
 value alpm_to_caml_pkgelem ( void * elem );
 value alpm_to_caml_dependency( void * elem );
+value alpm_to_caml_grpelem ( void * elem );
 
 typedef void * (*caml_elem_conv)( value );
 alpm_list_t * caml_to_alpm_list ( value list, caml_elem_conv converter );
@@ -26,6 +35,8 @@ void * caml_to_alpm_strelem ( value str );
 #define CAML_PKG_LIST( LIST ) alpm_to_caml_list( LIST, alpm_to_caml_pkgelem )
 #define CAML_DEP_LIST( LIST ) \
     alpm_to_caml_list( LIST, alpm_to_caml_dependency )
+#define CAML_GRP_LIST( LIST ) \
+    alpm_to_caml_list( LIST, alpm_to_caml_grpelem )
 
 #define ALPM_STR_LIST( LIST ) \
     caml_to_alpm_list( LIST, caml_to_alpm_strelem )
@@ -63,5 +74,6 @@ value alloc_alpm_pkg_autofree ( pmpkg_t * pkg );
 
 value caml_copy_depmod ( pmdepmod_t depmod );
 value caml_copy_dependency ( pmdepend_t * dep );
+value caml_copy_group ( pmgrp_t * group );
 
 #endif
