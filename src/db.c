@@ -67,6 +67,22 @@ CAMLprim value oalpm_db_search ( value db, value keywords )
     CAMLreturn( CAML_PKG_LIST( alpm_db_search( alpm_db, alpm_keywords )));
 }
 
+CAMLprim value oalpm_db_readgrp ( value db, value group_name )
+{
+    pmgrp_t * alpm_grp;
+    pmdb_t * alpm_db;
+
+    CAMLparam2( db, group_name );
+    alpm_db = Database_val( db );
+    alpm_grp = alpm_db_readgrp( alpm_db, String_val( group_name ));
+
+    if ( alpm_grp == NULL ) {
+        caml_failwith( "Group not found" );
+    }
+
+    CAMLreturn( caml_copy_group( alpm_grp ));
+}
+
 CAMLprim value oalpm_db_get_grpcache ( value db )
 {
     pmdb_t * alpm_db;

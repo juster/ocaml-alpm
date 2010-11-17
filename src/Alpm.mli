@@ -74,6 +74,7 @@ and database =
     method update   : bool -> unit
     method search   : string list -> package list
     method groups   : package_group list
+    method find_group : string -> package_group
   end
 and package_group =
   object

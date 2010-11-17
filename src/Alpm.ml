@@ -202,6 +202,8 @@ external db_search    : alpm_database -> string list -> alpm_package list
     = "oalpm_db_search"
 external db_get_grpcache : alpm_database -> ( string * alpm_package list ) list
     = "oalpm_db_get_grpcache"
+external db_readgrp : alpm_database -> string -> ( string * alpm_package list )
+    = "oalpm_db_readgrp"
 
 class package pkg_data =
   object(self)
@@ -253,6 +255,7 @@ and database db_data =
     method groups          =
       List.map (fun grp_pair -> new package_group grp_pair)
         (db_get_grpcache db_data)
+    method find_group name = new package_group (db_readgrp db_data name)
   end
 and package_group group_tuple =
   object

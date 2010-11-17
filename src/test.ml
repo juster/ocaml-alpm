@@ -86,3 +86,7 @@ let _ =
       grp#packages)
     localdb#groups ;
   
+  
+  let basegrp = localdb#find_group "base" in
+  print_endline "find_group:" ;
+  print_endline basegrp#name ;
