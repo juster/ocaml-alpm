@@ -35,6 +35,19 @@ CAMLprim value oalpm_db_add_url ( value db, value url )
                                     String_val( url )));
 }
 
+CAMLprim value oalpm_db_get_pkg ( value db, value pkgname )
+{
+    pmpkg_t * alpm_pkg;
+    pmdb_t * alpm_db;
+    CAMLparam2( db, pkgname );
+    alpm_db  = Database_val( db );
+    alpm_pkg = alpm_db_get_pkg( alpm_db, String_val( pkgname ));
+    if ( alpm_pkg == NULL ) {
+        caml_raise_constant( *caml_named_value( "Not_found" ));        
+    }
+    CAMLreturn( alloc_alpm_pkg( alpm_pkg ));
+}
+
 CAMLprim value oalpm_db_get_pkgcache ( value db )
 {
     alpm_list_t * pkg_list;

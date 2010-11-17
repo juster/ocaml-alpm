@@ -88,5 +88,8 @@ let _ =
   
   
   let basegrp = localdb#find_group "base" in
-  print_endline "find_group:" ;
+  print_endline "\n#find_group:" ;
   print_endline basegrp#name ;
+
+  print_endline "\n#find:" ;
+  print_endline (localdb#find "clyde-git")#name ;

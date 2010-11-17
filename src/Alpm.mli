@@ -70,6 +70,7 @@ and database =
     method name     : string
     method url      : string
     method addurl   : string -> unit
+    method find     : string -> package
     method packages : package list
     method update   : bool -> unit
     method search   : string list -> package list
