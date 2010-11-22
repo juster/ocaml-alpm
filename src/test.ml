@@ -32,7 +32,7 @@ let _ =
       t.tm_mday (t.tm_year + 1900)
   in
   
-  let localdb = Alpm.new_db "local" in print_endline (localdb#name) ;
+  let localdb = Alpm.register_local () in print_endline (localdb#name) ;
   let pkgs = localdb#packages in
   let dump_perl_pkg pkg =
     print_endline ("Perl package is in the " ^ pkg#db#name ^ " database.") ;

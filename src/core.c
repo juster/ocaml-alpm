@@ -30,21 +30,16 @@ CAMLprim value oalpm_version ( value unit )
     CAMLreturn( caml_copy_string( alpm_version() ));
 }
 
-CAMLprim value oalpm_register ( value name )
+CAMLprim value oalpm_register_local ( value unit )
 {
-    pmdb_t * db;
-    char * str;
+    CAMLparam1( unit );
+    CAMLreturn( alloc_alpm_db( alpm_db_register_local()));
+}
 
+CAMLprim value oalpm_register_sync ( value name )
+{
     CAMLparam1( name );
-    str = String_val( name );
-    if ( strcmp( str, "local" ) == 0 ) {
-        db = alpm_db_register_local();
-    }
-    else {
-        db = alpm_db_register_sync( str );
-    }
-
-    CAMLreturn( alloc_alpm_db( db ));
+    CAMLreturn( alloc_alpm_db( alpm_db_register_sync( String_val( name ))));
 }
 
 CAMLprim value oalpm_option_get_localdb ( value unit )

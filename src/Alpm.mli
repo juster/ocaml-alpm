@@ -38,7 +38,6 @@ class type package =
     method packager : string
     method md5sum   : string
     method arch     : string
-    method checkmd5sum : unit
 
     method requiredby : string list
     method licenses   : string list
@@ -61,21 +60,31 @@ class type package =
     method scriptlet  : bool
     method forced     : bool
 
+    method checkmd5sum : unit
+
     method reason     : reason
     method deps       : dependency list
     method db         : database
   end
 and database =
   object
-    method name     : string
-    method url      : string
-    method addurl   : string -> unit
-    method find     : string -> package
-    method packages : package list
-    method update   : bool -> unit
-    method search   : string list -> package list
-    method groups   : package_group list
+    method name       : string
+    method find       : string -> package
+    method packages   : package list
+    method search     : string list -> package list
+    method groups     : package_group list
     method find_group : string -> package_group
+  end
+and sync_database =
+  object
+    inherit database
+    method url    : string
+    method addurl : string -> unit
+    method update : bool -> unit
+  end
+and local_database =
+  object
+    inherit database
     method set_pkg_reason : string -> reason -> unit
   end
 and package_group =
@@ -146,9 +155,9 @@ val enable_fetchcb : (string -> string -> bool -> int) -> unit
 val disable_fetchcb : unit -> unit
 
 (* Database mutators/accessors *)
-val new_db  : string -> database
-val localdb : unit   -> database
-val syncdbs : unit   -> database list
-val db      : string -> database
-
-val vercmp : string -> string -> compare
+val register_local : unit -> local_database
+val register_sync  : string -> sync_database
+val localdb : unit   -> local_database
+val syncdbs : unit   -> sync_database list
+val repodb  : string -> sync_database
+val vercmp  : string -> string -> compare

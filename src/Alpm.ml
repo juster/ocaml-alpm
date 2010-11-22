@@ -130,8 +130,10 @@ let enable_fetchcb cb =
   Callback.register "fetch callback" cb ; oalpm_enable_fetch_cb ()
 
 (* Database accessors/mutators *)
-external oalpm_register : string -> alpm_database
-    = "oalpm_register"
+external oalpm_register_sync : string -> alpm_database
+    = "oalpm_register_sync"
+external oalpm_register_local : unit -> alpm_database
+    = "oalpm_register_local"
 external option_get_localdb : unit -> alpm_database
     = "oalpm_option_get_localdb"
 external oalpm_syncdbs : unit -> alpm_database list
@@ -246,23 +248,31 @@ class package pkg_data =
     method deps       = pkg_get_depends pkg_data
     method db         = new database (pkg_get_db pkg_data)
   end
-and database db_data =
+and database db =
   object
-    method name            = db_name db_data
-    method url             = db_url db_data
-    method addurl url      = db_addurl db_data url
-    method find name       = new package (db_get_pkg db_data name)
+    method name            = db_name db
+    method find name       = new package (db_get_pkg db name)
     method packages        =
-      List.map (fun pkg -> new package pkg) (db_pkgcache db_data)
-    method update force    = db_update force db_data
+      List.map (fun pkg -> new package pkg) (db_pkgcache db)
     method search keywords =
-      List.map (fun pkg -> new package pkg) (db_search db_data keywords)
+      List.map (fun pkg -> new package pkg) (db_search db keywords)
     method groups          =
       List.map (fun grp_pair -> new package_group grp_pair)
-        (db_get_grpcache db_data)
-    method find_group name = new package_group (db_readgrp db_data name)
+        (db_get_grpcache db)
+    method find_group name = new package_group (db_readgrp db name)
+  end
+and sync_database db =
+  object
+    inherit database db
+    method url          = db_url db
+    method addurl url   = db_addurl db url
+    method update force = db_update force db
+  end
+and local_database db =
+  object
+    inherit database db
     method set_pkg_reason name pkgreason =
-      db_set_pkgreason db_data name pkgreason
+      db_set_pkgreason db name pkgreason
   end
 and package_group group_tuple =
   object
@@ -273,12 +283,13 @@ and package_group group_tuple =
   end
 
 let load_pkgfile path = new package (oalpm_load_pkgfile path)
-let new_db name  = new database (oalpm_register name)
-let localdb unit = new database (option_get_localdb ())
+let register_sync name = new sync_database (oalpm_register_sync name)
+let register_local unit = new local_database (oalpm_register_local ())
+let localdb unit = new local_database (option_get_localdb ())
 let syncdbs unit =
-  List.map (fun rawdb -> new database rawdb) (oalpm_syncdbs ())
+  List.map (fun rawdb -> new sync_database rawdb) (oalpm_syncdbs ())
 
-let db name =
+let repodb name =
   let rec find_db name dblist =
     match dblist with
       []     -> raise Not_found
