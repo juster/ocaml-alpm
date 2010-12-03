@@ -12,3 +12,4 @@ pkg.o
 pkg.h
 errors.h
 trans.o
+trans.h

@@ -8,11 +8,6 @@ type alpm_database
 type alpm_package
 type alpm_package_autofree = alpm_package
 
-type pm_trans_flag = TransNoDeps | TransForce | TransNoSave |
-     TransCascade | TransRecurse | TransDBOnly | TransAllDeps |
-     TransDownloadOnly | TransNoScriptlet | TransNoConflicts | TransNeeded |
-     TransAllExplicit | TransUnneeded | TransRecurseall | TransNoLock
-
 type dependency_modifier =
   | Any     (** When there is only the package name. *)
   | Exactly (** == *)
@@ -62,7 +57,7 @@ module Dep =
           version  = (matched_group 3 depstr); }
   end
 
-exception AlpmError of string
+exception Error of string
 exception NoLocalDB
 
 (* Basic ALPM functions *)
@@ -302,15 +297,105 @@ let repodb name =
   in find_db name (syncdbs ())
 
 (* TRANSACTIONS *)
-external trans_init       : pm_trans_flag list -> unit = "oalpm_trans_init"
-external trans_release    : unit -> unit   = "oalpm_trans_release"
-external trans_sysupgrade : bool -> unit   = "oalpm_sync_sysupgrade"
-external trans_sync       : string -> unit = "oalpm_sync_target"
-external trans_pkgfile    : string -> unit = "oalpm_add_target"
-external trans_remove     : string -> unit = "oalpm_remove_target"
-external trans_syncfromdb : database -> string -> unit = "oalpm_sync_dbtarget"
+module Trans =
+  struct
+    (* Callbacks *)
+    type event =
+        CheckDepsStart
+      | CheckDepsDone
+      | FileConflictsStart
+      | FileConflictsDone
+      | ResolveDepsStart
+      | ResolveDepsDone
+      | InterConflictsStart
+      | InterConflictsDone of package
+      | AddStart
+      | AddDone
+      | RemoveStart
+      | RemoveDone
+      | UpgradeStart of (package)
+      | UpgradeDone of (package * package)
+      | IntegrityStart
+      | IntegrityDone
+      | DeltaIntegrityStart
+      | DeltaIntegrityDone
+      | DeltaPatchesStart
+      | DeltaPatchesDone of (string * string)
+      | DeltaPatchStart
+      | DeltaPatchDone
+      | DeltaPatchFailed of string
+      | Scriptlet of string
+      | Retrieve  of string
+    external oalpm_toggle_event_cb : bool -> unit = "oalpm_toggle_event_cb"
+    let enable_eventcb cb =
+      Callback.register "event callback" cb ;
+      oalpm_toggle_event_cb true
+    let disable_eventcb unit = oalpm_toggle_event_cb false
+
+    type conv_data =
+        InstallIgnore    of (package)
+      | ReplacePackage   of (package * package * string)
+      | PackageConflict  of (string  * string  * string)
+      | CorruptedPackage of (string)
+      | LocalNewer       of (package)
+      | RemovePackages   of (package list)
+    external oalpm_toggle_conv_cb : bool -> unit = "oalpm_toggle_conv_cb"
+    let enable_convcb cb =
+      Callback.register "conv callback" cb ;
+      oalpm_toggle_conv_cb true
+    let disable_convcb unit = oalpm_toggle_conv_cb false
+
+    type prog_type =
+        ProgAdd
+      | ProgUpgrade
+      | ProgRemove
+      | ProgConflicts
+    external oalpm_toggle_prog_cb : bool -> unit = "oalpm_toggle_prog_cb"
+    let enable_progresscb cb =
+      Callback.register "prog callback" cb ;
+      oalpm_toggle_prog_cb true
+    let disable_progresscb unit = oalpm_toggle_prog_cb false
+
+    type trans_flag =
+        NoDeps
+      | Force
+      | NoSave
+      | Cascade
+      | Recurse
+      | DBOnly
+      | AllDeps
+      | DownloadOnly
+      | NoScriptlet
+      | NoConflicts
+      | Needed
+      | AllExplicit
+      | Unneeded
+      | Recurseall
+      | NoLock
+
+    external init       : trans_flag list -> unit    = "oalpm_trans_init"
+    external prepare    : unit -> unit               = "oalpm_trans_prepare"
+    external commit     : unit -> unit               = "oalpm_trans_commit"
+    external release    : unit -> unit               = "oalpm_trans_release"
+    external sysupgrade : bool -> unit               = "oalpm_sync_sysupgrade"
+    external sync       : string -> unit             = "oalpm_sync_target"
+    external addpkgfile : string -> unit             = "oalpm_add_target"
+    external remove     : string -> unit             = "oalpm_remove_target"
+    external syncfromdb : string -> string -> unit   = "oalpm_sync_dbtarget"
+
+    (* Functions returning package objects must be wrapped in OCAML code. *)
+    external oalpm_trans_get_add : unit -> alpm_package list 
+        = "oalpm_trans_get_add"
+    external oalpm_trans_get_remove : unit -> alpm_package list 
+        = "oalpm_trans_get_remove"
+    let additions unit =
+      List.map (fun rawpkg -> new package rawpkg) (oalpm_trans_get_add ())
+    let removals unit =
+      List.map (fun rawpkg -> new package rawpkg) (oalpm_trans_get_remove ())
+
+  end
 
 (* We must register our exception to allow the C code to use it. *)
 let () =
-  Callback.register_exception "AlpmError" (AlpmError "any string") ;
+  Callback.register_exception "AlpmError" (Error "any string") ;
   Callback.register_exception "Not_found" (Not_found) ;

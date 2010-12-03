@@ -53,4 +53,3 @@ int  oalpm_fetch_cb ( const char * url, const char * localpath, int force )
     return Int_val( result );
 }
 
-                   

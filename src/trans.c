@@ -10,13 +10,200 @@
 
 #include "core.h"
 #include "datatypes.h"
+#include "trans.h"
+
+/* CALLBACKS ****************************************************************/
+
+/* These define mutators/accessors for callbacks. */
+
+OALPM_TRANS_CB( event )
+OALPM_TRANS_CB( conv  )
+OALPM_TRANS_CB( prog  )
+
+/* The following C functions are wrappers that call our CAML callbacks */
+
+static void oalpm_event_cb ( pmtransevt_t type, void * one, void * two )
+{
+    if ( event_callback == NULL ) return;
+    
+    CAMLlocal1( event );
+    switch ( type ) {
+    case PM_TRANS_EVT_INTERCONFLICTS_DONE:
+        event = caml_alloc( 1, 0 );
+        Store_field( event, 0, alloc_alpm_pkg( (pmpkg_t *)one ));
+        break;
+    case PM_TRANS_EVT_UPGRADE_START:
+        event = caml_alloc( 1, 1 );
+        Store_field( event, 0, alloc_alpm_pkg( (pmpkg_t *)one ));
+        break;
+    case PM_TRANS_EVT_UPGRADE_DONE:
+        event = caml_alloc( 2, 2 );
+        Store_field( event, 0, alloc_alpm_pkg( (pmpkg_t *)one ));
+        Store_field( event, 1, alloc_alpm_pkg( (pmpkg_t *)two ));
+        break;
+    case PM_TRANS_EVT_DELTA_PATCHES_DONE:
+        event = caml_alloc( 2, 3 );
+        Store_field( event, 0, caml_copy_string( (char *)one ));
+        Store_field( event, 1, caml_copy_string( (char *)two ));
+        break;
+    case PM_TRANS_EVT_DELTA_PATCH_FAILED:
+        event = caml_alloc( 1, 4 );
+        Store_field( event, 0, caml_copy_string( (char *)one ));
+        break;
+    case PM_TRANS_EVT_SCRIPTLET_INFO:
+        event = caml_alloc( 1, 5 );
+        Store_field( event, 0, caml_copy_string( (char *)one ));
+        break;
+    case PM_TRANS_EVT_RETRIEVE_START:
+        event = caml_alloc( 1, 6 );
+        Store_field( event, 0, caml_copy_string( (char *)one ));
+        break;
+    default:
+        event = Val_int( type - 1 );
+    }
+
+    caml_callback( *event_callback, event );
+}
+
+static void oalpm_conv_cb ( pmtransconv_t type,
+                            void * one, void * two, void * three,
+                            int * answer )
+{
+    CAMLlocal2( event, response );
+
+    if ( conv_callback == NULL ) return;
+
+    /* Tags for the block must match the order the variant type
+       is defined in. */
+
+    switch ( type ) {
+	case PM_TRANS_CONV_INSTALL_IGNOREPKG:
+        /* ( package ) */
+        event = caml_alloc( 1, 0 );
+        Store_field( event, 0, alloc_alpm_pkg( (pmpkg_t *)one ));
+        break;
+	case PM_TRANS_CONV_REPLACE_PKG:
+        /* ( package * package * string ) */
+        event = caml_alloc( 3, 1 );
+        Store_field( event, 0, alloc_alpm_pkg( (pmpkg_t *)one ));
+        Store_field( event, 1, alloc_alpm_pkg( (pmpkg_t *)two ));
+        Store_field( event, 2, caml_copy_string( (char *)three ));
+        break;
+	case PM_TRANS_CONV_CONFLICT_PKG:
+        /* ( string, string, string ) */
+        event = caml_alloc( 3, 2 );
+        Store_field( event, 0, caml_copy_string( (char *)one ));
+        Store_field( event, 1, caml_copy_string( (char *)two ));
+        Store_field( event, 2, caml_copy_string( (char *)three ));
+        break;
+	case PM_TRANS_CONV_CORRUPTED_PKG:
+        /* ( string ) */
+        event = caml_alloc( 1, 3 );
+        Store_field( event, 0, caml_copy_string( (char *)one ));
+        break;
+	case PM_TRANS_CONV_LOCAL_NEWER:
+        /* ( package ) */
+        event = caml_alloc( 1, 4 );
+        Store_field( event, 0, alloc_alpm_pkg( (pmpkg_t *)one ));
+        break;
+	case PM_TRANS_CONV_REMOVE_PKGS:
+        /* ( package list ) */
+        event = caml_alloc( 1, 5 );
+        Store_field( event, 0, CAML_PKG_LIST( (alpm_list_t *)one ));
+        break;
+    default:
+        /* Abort the callback if we don't know the conversation type. */
+        return;
+    }
+
+    response = caml_callback( *conv_callback, event );
+    *answer = Bool_val( response );
+    return;
+}
+
+static void oalpm_prog_cb ( pmtransprog_t type, const char * pkg,
+                            int percent, int total_count, int total_pos )
+{
+    CAMLlocalN( args, 5 );
+
+    switch ( type ) {
+	case PM_TRANS_PROGRESS_ADD_START:
+        args[0] = Val_int( 0 );
+        break;
+	case PM_TRANS_PROGRESS_UPGRADE_START:
+        args[0] = Val_int( 1 );
+        break;
+	case PM_TRANS_PROGRESS_REMOVE_START:
+        args[0] = Val_int( 2 );
+        break;
+	case PM_TRANS_PROGRESS_CONFLICTS_START:
+        args[0] = Val_int( 3 );
+        break;
+    default:
+        return;
+    }
+
+    args[1] = caml_copy_string( pkg );
+    args[2] = Val_int( percent );
+    args[3] = Val_int( total_count );
+    args[4] = Val_int( total_pos );
+
+    caml_callbackN( *prog_callback, 5, args );
+    return;
+}
+
+/****************************************************************************/
+
+pmtransflag_t caml_to_alpm_transflag ( value flag )
+{
+    int flag_idx = Int_val( flag );
+    if ( flag_idx >= 3  ) ++flag_idx;
+    if ( flag_idx >= 7  ) ++flag_idx;
+    if ( flag_idx >= 12 ) ++flag_idx;
+    return (1 << flag_idx);
+}
+
+pmtransflag_t caml_to_alpm_transflaglist ( value flag_list )
+{
+    pmtransflag_t bitflags;
+
+    if ( ! Is_block( flag_list )) { return 0; }
+    bitflags  = caml_to_alpm_transflag    ( Field( flag_list, 0 ));
+    bitflags |= caml_to_alpm_transflaglist( Field( flag_list, 1 ));
+    return bitflags;
+}
 
 CAMLprim value oalpm_trans_init ( value flaglist )
 {
     pmtransflag_t bitflags;
+    alpm_trans_cb_event    eventcb = NULL;
+    alpm_trans_cb_conv     convcb  = NULL;
+    alpm_trans_cb_progress progcb  = NULL;
+
     CAMLparam1( flaglist );
     bitflags = caml_to_alpm_transflaglist( flaglist );
-    OALPMreturn( alpm_trans_init( bitflags, NULL, NULL, NULL ));
+
+    if ( event_callback != NULL ) eventcb = oalpm_event_cb;
+    if ( conv_callback  != NULL ) convcb  = oalpm_conv_cb;
+    if ( prog_callback  != NULL ) progcb  = oalpm_prog_cb;
+
+    OALPMreturn( alpm_trans_init( bitflags, eventcb, convcb, progcb ));
+}
+
+CAMLprim value oalpm_trans_prepare ( value unit )
+{
+    alpm_list_t * errors;
+
+    CAMLparam1( unit );
+    OALPMreturn( alpm_trans_prepare( &errors ));
+}
+
+CAMLprim value oalpm_trans_commit ( value unit )
+{
+    alpm_list_t * errors;
+
+    CAMLparam1( unit );
+    OALPMreturn( alpm_trans_commit( &errors ));
 }
 
 CAMLprim value oalpm_trans_release ( value unit )
@@ -28,13 +215,25 @@ CAMLprim value oalpm_trans_release ( value unit )
 CAMLprim value oalpm_trans_interrupt ( value unit )
 {
     CAMLparam1( unit );
-    OALPMreturn( alpm_trans_interrupt() );
+    OALPMreturn( alpm_trans_interrupt());
+}
+
+CAMLprim value oalpm_trans_get_add ( value unit )
+{
+    CAMLparam1( unit );
+    CAMLreturn( CAML_PKG_LIST( alpm_trans_get_add()));
+}
+
+CAMLprim value oalpm_trans_get_remove ( value unit )
+{
+    CAMLparam1( unit );
+    CAMLreturn( CAML_PKG_LIST( alpm_trans_get_remove()));
 }
 
 CAMLprim value oalpm_sync_sysupgrade ( value enable_downgrade )
 {
     CAMLparam1( enable_downgrade );
-    OALPMreturn( alpm_sync_sysupgrade( Val_bool( enable_downgrade )));
+    OALPMreturn( alpm_sync_sysupgrade( Bool_val( enable_downgrade )));
 }
 
 CAMLprim value oalpm_sync_target ( value target )
@@ -58,6 +257,6 @@ CAMLprim value oalpm_remove_target ( value target )
 CAMLprim value oalpm_sync_dbtarget ( value db, value target )
 {
     CAMLparam2( db, target );
-    OALPMreturn( alpm_sync_dbtarget( Database_val( db ),
+    OALPMreturn( alpm_sync_dbtarget( String_val( db ),
                                      String_val( target )));
 }

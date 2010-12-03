@@ -114,8 +114,8 @@ let _ =
     print_endline ("Lock file is " ^ (Alpm.get_lockfile ())) ;
   in
   try
-    Alpm.trans_init [] ;
+    Alpm.Trans.init [] ;
     print_endline "Initialized transaction." ;
-    Alpm.trans_release () ;
+    Alpm.Trans.release () ;
     print_endline "Released transaction."
-  with AlpmError(str) -> print_transerr str ;;
+  with Error(str) -> print_transerr str ;;

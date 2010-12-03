@@ -180,22 +180,3 @@ value caml_copy_group ( pmgrp_t * group )
     Store_field( camlgroup, 1, CAML_PKG_LIST( group->packages ));
     CAMLreturn( camlgroup );
 }
-
-pmtransflag_t caml_to_alpm_transflag ( value flag )
-{
-    int flag_idx = Val_int( flag );
-    if ( flag_idx >= 3  ) ++flag_idx;
-    if ( flag_idx >= 7  ) ++flag_idx;
-    if ( flag_idx >= 12 ) ++flag_idx;
-    return 1 << flag_idx;
-}
-
-pmtransflag_t caml_to_alpm_transflaglist ( value flag_list )
-{
-    pmtransflag_t bitflags;
-
-    if ( ! Is_block( flag_list )) { return 0; }
-    bitflags  = caml_to_alpm_transflag(     Field( flag_list, 0 ));
-    bitflags &= caml_to_alpm_transflaglist( Field( flag_list, 1 ));
-    return bitflags;
-}

@@ -28,11 +28,6 @@ module Dep:
       val dep_of_string: string -> dependency
     end
 
-type pm_trans_flag = TransNoDeps | TransForce | TransNoSave |
-     TransCascade | TransRecurse | TransDBOnly | TransAllDeps |
-     TransDownloadOnly | TransNoScriptlet | TransNoConflicts | TransNeeded |
-     TransAllExplicit | TransUnneeded | TransRecurseall | TransNoLock
-
 class type package =
   object
     method name     : string
@@ -98,7 +93,7 @@ and package_group =
     method packages : package list
   end
 
-exception AlpmError of string
+exception Error of string
 exception NoLocalDB
 
 val init         : unit -> unit
@@ -169,11 +164,86 @@ val repodb  : string -> sync_database
 val vercmp  : string -> string -> compare
 
 (* TRANSACTIONS *)
+module Trans:
+  sig
+    (* Callbacks *)
+    type event =
+        CheckDepsStart
+      | CheckDepsDone
+      | FileConflictsStart
+      | FileConflictsDone
+      | ResolveDepsStart
+      | ResolveDepsDone
+      | InterConflictsStart
+      | InterConflictsDone of package
+      | AddStart
+      | AddDone
+      | RemoveStart
+      | RemoveDone
+      | UpgradeStart of (package)
+      | UpgradeDone of (package * package)
+      | IntegrityStart
+      | IntegrityDone
+      | DeltaIntegrityStart
+      | DeltaIntegrityDone
+      | DeltaPatchesStart
+      | DeltaPatchesDone of (string * string)
+      | DeltaPatchStart
+      | DeltaPatchDone
+      | DeltaPatchFailed of string
+      | Scriptlet of string
+      | Retrieve  of string
+    val enable_eventcb  : (event -> unit) -> unit
+    val disable_eventcb : unit -> unit
 
-val trans_init       : pm_trans_flag list -> unit
-val trans_release    : unit -> unit
-val trans_sysupgrade : bool -> unit
-val trans_sync       : string -> unit
-val trans_pkgfile    : string -> unit
-val trans_remove     : string -> unit
-val trans_syncfromdb : database -> string -> unit
+    type conv_data =
+        InstallIgnore    of (package)
+      | ReplacePackage   of (package * package * string)
+      | PackageConflict  of (string  * string  * string)
+      | CorruptedPackage of (string)
+      | LocalNewer       of (package)
+      | RemovePackages   of (package list)
+    val enable_convcb  : (conv_data -> bool) -> unit
+    val disable_convcb : unit -> unit
+
+    type prog_type =
+        ProgAdd
+      | ProgUpgrade
+      | ProgRemove
+      | ProgConflicts
+    val enable_progresscb : (prog_type -> string -> int -> int -> int)
+      -> unit
+    val disable_progresscb : unit -> unit
+
+        (* Basic Transaction Functions *)
+    type trans_flag =
+        NoDeps
+      | Force
+      | NoSave
+      | Cascade
+      | Recurse
+      | DBOnly
+      | AllDeps
+      | DownloadOnly
+      | NoScriptlet
+      | NoConflicts
+      | Needed
+      | AllExplicit
+      | Unneeded
+      | Recurseall
+      | NoLock
+
+    val init       : trans_flag list -> unit
+    val prepare    : unit -> unit
+    val commit     : unit -> unit
+    val release    : unit -> unit
+    val additions  : unit -> package list
+    val removals   : unit -> package list
+    val sysupgrade : bool -> unit
+    val sync       : string -> unit
+    val addpkgfile : string -> unit
+    val remove     : string -> unit
+    val syncfromdb : string -> string -> unit
+  end
+
+  (* Accessors *)

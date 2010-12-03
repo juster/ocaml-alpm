@@ -19,7 +19,7 @@ struct __pmgrp_t {
 
 /* List conversion */
 typedef value (*alpm_elem_conv)( void * );
-value alpm_to_caml_list ( alpm_list_t *list, alpm_elem_conv converter );
+value alpm_to_caml_list ( alpm_list_t * list, alpm_elem_conv converter );
 value alpm_to_caml_strelem ( void * elem );
 value alpm_to_caml_dbelem ( void * elem );
 value alpm_to_caml_pkgelem ( void * elem );
@@ -75,10 +75,5 @@ value alloc_alpm_pkg_autofree ( pmpkg_t * pkg );
 value caml_copy_depmod ( pmdepmod_t depmod );
 value caml_copy_dependency ( pmdepend_t * dep );
 value caml_copy_group ( pmgrp_t * group );
-
-/* Transaction data types */
-
-pmtransflag_t caml_to_alpm_transflag ( value flag );
-pmtransflag_t caml_to_alpm_transflaglist ( value flag_list );
 
 #endif
