@@ -14,7 +14,7 @@ let _ =
            a dependency of that target. *)
         dep [ "ocaml" ; "link" ; "use_libalpm" ] [ "libalpm.a" ] ;
 
-        let link_specs = S [ A "-cclib" ; A "-lalpm" ;
+        let link_specs = S [ A "-cclib" ; A "-lalpm" ; A "-g" ;
                              (S (List.map (fun x -> A x) oalpm_stub_libs)) ]
         in
 
