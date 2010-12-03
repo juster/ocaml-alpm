@@ -2,7 +2,7 @@ open Ocamlbuild_plugin
 
 let oalpm_stub_libs = [ "callbacks.o" ; "core.o" ;
                         "datatypes.o" ; "db.o" ; "opts.o" ;
-                        "pkg.o" ]
+                        "pkg.o" ; "trans.o" ]
 
 let _ =
   dispatch begin function

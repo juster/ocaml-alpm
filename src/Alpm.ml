@@ -8,6 +8,11 @@ type alpm_database
 type alpm_package
 type alpm_package_autofree = alpm_package
 
+type pm_trans_flag = TransNoDeps | TransForce | TransNoSave |
+     TransCascade | TransRecurse | TransDBOnly | TransAllDeps |
+     TransDownloadOnly | TransNoScriptlet | TransNoConflicts | TransNeeded |
+     TransAllExplicit | TransUnneeded | TransRecurseall | TransNoLock
+
 type dependency_modifier =
   | Any     (** When there is only the package name. *)
   | Exactly (** == *)
@@ -295,6 +300,15 @@ let repodb name =
       []     -> raise Not_found
     | hd::tl -> if hd#name = name then hd else find_db name tl
   in find_db name (syncdbs ())
+
+(* TRANSACTIONS *)
+external trans_init       : pm_trans_flag list -> unit = "oalpm_trans_init"
+external trans_release    : unit -> unit   = "oalpm_trans_release"
+external trans_sysupgrade : bool -> unit   = "oalpm_sync_sysupgrade"
+external trans_sync       : string -> unit = "oalpm_sync_target"
+external trans_pkgfile    : string -> unit = "oalpm_add_target"
+external trans_remove     : string -> unit = "oalpm_remove_target"
+external trans_syncfromdb : database -> string -> unit = "oalpm_sync_dbtarget"
 
 (* We must register our exception to allow the C code to use it. *)
 let () =

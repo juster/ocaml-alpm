@@ -28,6 +28,11 @@ module Dep:
       val dep_of_string: string -> dependency
     end
 
+type pm_trans_flag = TransNoDeps | TransForce | TransNoSave |
+     TransCascade | TransRecurse | TransDBOnly | TransAllDeps |
+     TransDownloadOnly | TransNoScriptlet | TransNoConflicts | TransNeeded |
+     TransAllExplicit | TransUnneeded | TransRecurseall | TransNoLock
+
 class type package =
   object
     method name     : string
@@ -160,4 +165,15 @@ val register_sync  : string -> sync_database
 val localdb : unit   -> local_database
 val syncdbs : unit   -> sync_database list
 val repodb  : string -> sync_database
+
 val vercmp  : string -> string -> compare
+
+(* TRANSACTIONS *)
+
+val trans_init       : pm_trans_flag list -> unit
+val trans_release    : unit -> unit
+val trans_sysupgrade : bool -> unit
+val trans_sync       : string -> unit
+val trans_pkgfile    : string -> unit
+val trans_remove     : string -> unit
+val trans_syncfromdb : database -> string -> unit

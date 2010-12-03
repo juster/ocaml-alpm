@@ -76,4 +76,9 @@ value caml_copy_depmod ( pmdepmod_t depmod );
 value caml_copy_dependency ( pmdepend_t * dep );
 value caml_copy_group ( pmgrp_t * group );
 
+/* Transaction data types */
+
+pmtransflag_t caml_to_alpm_transflag ( value flag );
+pmtransflag_t caml_to_alpm_transflaglist ( value flag_list );
+
 #endif

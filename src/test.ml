@@ -92,7 +92,8 @@ let _ =
   print_endline basegrp#name ;
 
   print_endline "\n#find:" ;
-  print_endline (localdb#find "clyde-git")#name ;
+  print_endline (try (localdb#find "clyde-git")#name
+                 with Not_found -> "*NOT FOUND*");
 
   print_endline "\n#set_pkg_reason:" ;
   localdb#set_pkg_reason "perl" Explicit;
@@ -102,6 +103,19 @@ let _ =
      | Explicit   -> "explicitly"
      | Dependency -> "as a dependency")) ;
 
-  try localdb#find "this-package-does-not-exist" ; ()
-  with Not_found -> () ;
-        
+  try
+    localdb#find "this-package-does-not-exist" ;
+    print_endline "ERROR: a non-existant package did not throw an error"
+  with Not_found -> print_endline "Package does not exist, yay!" ;;
+
+let _ =
+  let print_transerr str =
+    print_endline ("ERROR: " ^ str) ;
+    print_endline ("Lock file is " ^ (Alpm.get_lockfile ())) ;
+  in
+  try
+    Alpm.trans_init [] ;
+    print_endline "Initialized transaction." ;
+    Alpm.trans_release () ;
+    print_endline "Released transaction."
+  with AlpmError(str) -> print_transerr str ;;
