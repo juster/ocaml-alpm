@@ -234,6 +234,9 @@ module Trans:
       | NoLock
 
     (* Error Types *)
+    type conflict = { packages: ( string * string );
+                      reason:   string; }
+
     type file_conflict_kind = PackageConflict | FileConflict
     type file_conflict      = { kind:    file_conflict_kind;
                                 target:  string;

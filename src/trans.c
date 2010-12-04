@@ -185,7 +185,28 @@ pmtransflag_t caml_to_alpm_transflaglist ( value flag_list )
 
 /* ERRORS */
 
-/* File conflicts */
+value alpm_to_caml_conflict ( void * data )
+{
+    pmconflict_t * conflict = data;
+    const char * str;
+
+    CAMLparam0();
+    CAMLlocal2( conflict_rec, packages );
+    packages     = caml_alloc( 2, 0 );
+    conflict_rec = caml_alloc( 2, 0 );
+
+    str = alpm_conflict_get_package1( conflict );
+    Store_field( packages, 0, caml_copy_string( str ));
+    str = alpm_conflict_get_package2( conflict );
+    Store_field( packages, 1, caml_copy_string( str ));
+    Store_field( conflict_rec, 0, packages );
+
+    str = alpm_conflict_get_reason( conflict );
+    Store_field( conflict_rec, 1, caml_copy_string( str ));
+    
+    CAMLreturn( conflict_rec );
+}
+
 value alpm_to_caml_fileconflict ( void * data )
 {
     pmfileconflict_t * conflict = data;
