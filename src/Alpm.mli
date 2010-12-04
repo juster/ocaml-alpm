@@ -93,7 +93,7 @@ and package_group =
     method packages : package list
   end
 
-exception Error of string
+exception AlpmError of string
 exception NoLocalDB
 
 val init         : unit -> unit
@@ -245,7 +245,17 @@ module Trans:
 
     type dep_missing = { target: string;
                          cause:  string;
-                         dep:    dependency; }
+                         dep:    dependency;  }
+
+    type trans_error =
+        Conflict       of conflict list
+      | FileConflict   of file_conflict list
+      | DepMissing     of dep_missing list
+      | InvalidDelta   of string list
+      | InvalidPackage of string list
+      | InvalidArch    of string list
+
+    exception TransError of trans_error
 
     val init       : trans_flag list -> unit
     val prepare    : unit -> unit

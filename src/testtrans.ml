@@ -11,8 +11,8 @@ let level_string level =
 
 let logger level msg =
   match level with
-  (*   LogFunction -> () *)
-  (* | *) _ -> print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
+    LogFunction -> ()
+  | _ -> print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
 
 let logevent event =
   match event with
@@ -59,6 +59,22 @@ let print_trans_pkgs unit =
                            (List.map (fun pkg -> pkg#name) remlist))
   end
 
+let rec dump_depmiss dmlist =
+  match dmlist with
+    []     -> ()
+  | hd::tl ->
+      printf ":: %s: requires %s\n" hd.target (Alpm.Dep.string_of_dep hd.dep) ;
+      dump_depmiss tl
+
+let dump_error transerr =
+  match transerr with
+    Conflict(c)        -> print_endline "conflict"
+  | FileConflict(fc)   -> print_endline "file conflict"
+  | DepMissing(dmlist) -> dump_depmiss dmlist
+  | InvalidDelta(id)   -> print_endline "invalid delta"
+  | InvalidPackage(ip) -> print_endline "invalid package"
+  | InvalidArch(ia)    -> print_endline "invalid architecture" ;;
+
 let _ =
   Alpm.init () ;
   Alpm.set_root "/" ;
@@ -67,18 +83,22 @@ let _ =
   Alpm.set_logfile "test.log" ;
   Alpm.register_local () ;
 
-  Alpm.enable_logcb logger ;
+  (* Alpm.enable_logcb logger ; *)
   Alpm.Trans.enable_eventcb logevent;
-  Alpm.Trans.init [ Cascade ];
+  Alpm.Trans.init [];
   print_endline "Initialized transaction.";
   begin
     try
-      Alpm.Trans.remove "cairo";
+      print_endline "*DBG* Calling Trans.remove" ;
+      Alpm.Trans.remove "libx11";
+      print_endline "*DBG* Calling Trans.prepare" ;
       Alpm.Trans.prepare ();
       print_trans_pkgs ();
-      Alpm.Trans.commit ();
-    with Alpm.Error(str) -> print_endline ("ERROR: " ^ str)
-  end;
+      (* Alpm.Trans.commit (); *)
+    with TransError(err) ->
+      print_endline "*DBG* caught TransError" ;
+      dump_error err
+  end ;
   Alpm.Trans.release ();
   print_endline "Released transaction.";
 

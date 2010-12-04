@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdio.h>
 
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
@@ -183,8 +184,7 @@ pmtransflag_t caml_to_alpm_transflaglist ( value flag_list )
     return bitflags;
 }
 
-/* ERRORS */
-
+/* Errors */
 value alpm_to_caml_conflict ( void * data )
 {
     pmconflict_t * conflict = data;
@@ -238,18 +238,53 @@ value alpm_to_caml_depmissing ( void * data )
 {
     pmdepmissing_t * dm = data;
     const char * str;
-    CAMLparam0();
-    CAMLlocal2( depmiss, dep );
-    
-    dep     = caml_copy_dependency( alpm_miss_get_dep( dm ));
-    depmiss = caml_alloc( 3, 0 );
-    str = alpm_miss_get_target( dm );
-    Store_field( depmiss, 0, caml_copy_string( str ));
-    str = alpm_miss_get_causingpkg( dm );
-    Store_field( depmiss, 1, caml_copy_string( str ));
-    Store_field( depmiss, 2, dep );
 
-    CAMLreturn( depmiss );
+    CAMLparam0();
+    CAMLlocal2( dep, dmrec );
+
+    dmrec   = caml_alloc( 2, 0 );
+
+    str = alpm_miss_get_target( dm );
+    Store_field( dmrec, 0, caml_copy_string( str ));
+
+    str = alpm_miss_get_causingpkg( dm );
+    Store_field( dmrec, 1, caml_copy_string( str ));
+
+    dep = caml_copy_dependency( alpm_miss_get_dep( dm ));
+    Store_field( dmrec, 2, dep );
+
+    CAMLreturn( dmrec );
+}
+
+value alpm_to_caml_transerrlist ( alpm_list_t * errors )
+{
+    alpm_elem_conv conv;
+    int block_tag;
+
+    CAMLparam0();
+    CAMLlocal2( errlist, errvariant );
+
+#define TRANSERR( ID, TAG, CONV ) \
+    case ID : block_tag = TAG; conv = CONV; break;
+    
+    switch ( pm_errno ) {
+        TRANSERR( PM_ERR_CONFLICTING_DEPS, 0, alpm_to_caml_conflict );
+        TRANSERR( PM_ERR_FILE_CONFLICTS,   1, alpm_to_caml_fileconflict );
+        TRANSERR( PM_ERR_UNSATISFIED_DEPS, 2, alpm_to_caml_depmissing );
+        TRANSERR( PM_ERR_DLT_INVALID,      3, alpm_to_caml_strelem );
+        TRANSERR( PM_ERR_PKG_INVALID,      4, alpm_to_caml_strelem );
+        TRANSERR( PM_ERR_PKG_INVALID_ARCH, 5, alpm_to_caml_strelem );
+    default:
+        caml_failwith( "Unrecognized transaction error" );
+    }
+
+#undef TRANSERR
+
+    errvariant = caml_alloc( 1, block_tag );
+    errlist    = alpm_to_caml_list( errors, conv );
+    Store_field( errvariant, 0, errlist );
+
+    CAMLreturn( errvariant );
 }
 
 /****************************************************************************/
@@ -274,17 +309,39 @@ CAMLprim value oalpm_trans_init ( value flaglist )
 CAMLprim value oalpm_trans_prepare ( value unit )
 {
     alpm_list_t * errors;
+    int ret;
 
     CAMLparam1( unit );
-    OALPMreturn( alpm_trans_prepare( &errors ));
+    CAMLlocal1( transerr );
+
+    ret = alpm_trans_prepare( &errors );
+    if ( ret == -1 ) {
+        fprintf( stderr, "*DBG* alpm_trans_prepare returned -1\n" );
+        transerr = alpm_to_caml_transerrlist( errors );
+        fprintf( stderr, "*DBG* raising TransErr exception\n" );
+        caml_raise_with_arg( *caml_named_value( "TransError" ),
+                             transerr );
+    }
+
+    CAMLreturn( Val_unit );
 }
 
 CAMLprim value oalpm_trans_commit ( value unit )
 {
     alpm_list_t * errors;
+    int ret;
 
     CAMLparam1( unit );
-    OALPMreturn( alpm_trans_commit( &errors ));
+    CAMLlocal1( transerr );
+
+    ret = alpm_trans_commit( &errors );
+    if ( ret == -1 ) {
+        transerr = alpm_to_caml_transerrlist( errors );
+        caml_raise_with_arg( *caml_named_value( "TransError" ),
+                             transerr );
+    }
+
+    CAMLreturn( Val_unit );
 }
 
 CAMLprim value oalpm_trans_release ( value unit )

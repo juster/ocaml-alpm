@@ -57,7 +57,7 @@ module Dep =
           version  = (matched_group 3 depstr); }
   end
 
-exception Error of string
+exception AlpmError of string
 exception NoLocalDB
 
 (* Basic ALPM functions *)
@@ -387,6 +387,16 @@ module Trans =
                          cause:  string;
                          dep:    dependency; }
 
+    type trans_error =
+        Conflict       of conflict list
+      | FileConflict   of file_conflict list
+      | DepMissing     of dep_missing list
+      | InvalidDelta   of string list
+      | InvalidPackage of string list
+      | InvalidArch    of string list
+
+    exception TransError of trans_error
+
     external init       : trans_flag list -> unit    = "oalpm_trans_init"
     external prepare    : unit -> unit               = "oalpm_trans_prepare"
     external commit     : unit -> unit               = "oalpm_trans_commit"
@@ -411,5 +421,7 @@ module Trans =
 
 (* We must register our exception to allow the C code to use it. *)
 let () =
-  Callback.register_exception "AlpmError" (Error "any string") ;
+  Callback.register_exception "AlpmError" (AlpmError "string") ;
+  Callback.register_exception "TransError"
+    (Trans.TransError (Trans.InvalidPackage ["string"])) ;
   Callback.register_exception "Not_found" (Not_found) ;

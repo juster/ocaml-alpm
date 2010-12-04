@@ -49,8 +49,8 @@ value alpm_to_caml_list ( alpm_list_t * list, alpm_elem_conv converter )
 
     if ( list ) {
         cell = caml_alloc( 2, 0 );
-        Store_field( cell, 1, alpm_to_caml_list( list->next, converter ));
         Store_field( cell, 0, (*converter)( list->data ));
+        Store_field( cell, 1, alpm_to_caml_list( list->next, converter ));
     }
     else {
         cell = Val_int( 0 );
