@@ -24,9 +24,11 @@ OALPM_TRANS_CB( prog  )
 
 static void oalpm_event_cb ( pmtransevt_t type, void * one, void * two )
 {
-    if ( event_callback == NULL ) return;
-    
+    CAMLparam0();
     CAMLlocal1( event );
+
+    if ( event_callback == NULL ) CAMLreturn0;
+    
     switch ( type ) {
     case PM_TRANS_EVT_INTERCONFLICTS_DONE:
         event = caml_alloc( 1, 0 );
@@ -63,12 +65,14 @@ static void oalpm_event_cb ( pmtransevt_t type, void * one, void * two )
     }
 
     caml_callback( *event_callback, event );
+    CAMLreturn0;
 }
 
 static void oalpm_conv_cb ( pmtransconv_t type,
                             void * one, void * two, void * three,
                             int * answer )
 {
+    CAMLparam0();
     CAMLlocal2( event, response );
 
     if ( conv_callback == NULL ) return;
@@ -117,13 +121,14 @@ static void oalpm_conv_cb ( pmtransconv_t type,
     }
 
     response = caml_callback( *conv_callback, event );
-    *answer = Bool_val( response );
-    return;
+    *answer  = Bool_val( response );
+    CAMLreturn0;
 }
 
 static void oalpm_prog_cb ( pmtransprog_t type, const char * pkg,
                             int percent, int total_count, int total_pos )
 {
+    CAMLparam0();
     CAMLlocalN( args, 5 );
 
     switch ( type ) {
@@ -149,7 +154,7 @@ static void oalpm_prog_cb ( pmtransprog_t type, const char * pkg,
     args[4] = Val_int( total_pos );
 
     caml_callbackN( *prog_callback, 5, args );
-    return;
+    CAMLreturn0;
 }
 
 /****************************************************************************/

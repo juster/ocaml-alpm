@@ -11,8 +11,8 @@ let level_string level =
 
 let logger level msg =
   match level with
-    LogFunction -> ()
-  | _ -> print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
+  (*   LogFunction -> () *)
+  (* | *) _ -> print_string ( "LOG [" ^ ( level_string level ) ^ "] " ^ msg )
 
 let logevent event =
   match event with
