@@ -10,8 +10,8 @@ type dependency_modifier =
   | Exactly (** == *)
   | AtLeast (** >= *)
   | AtMost  (** <= *)
-  | Below   (** >  *)
-  | Above   (** <  *)
+  | Above   (** >  *)
+  | Below   (** <  *)
 
 (** A package dependency describing the necessary version of
     a package required by another package. *)
