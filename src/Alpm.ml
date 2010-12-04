@@ -11,10 +11,10 @@ type alpm_package_autofree = alpm_package
 type dependency_modifier =
   | Any     (** When there is only the package name. *)
   | Exactly (** == *)
-  | Above   (** <  *)
-  | Below   (** >  *)
   | AtLeast (** >= *)
   | AtMost  (** <= *)
+  | Below   (** >  *)
+  | Above   (** <  *)
 
 type dependency = { package  : string;
                     modifier : dependency_modifier;

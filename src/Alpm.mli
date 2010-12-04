@@ -5,13 +5,13 @@ type reason    = Explicit | Dependency
 type compare   = Less | Equal | Greater
 
 (** The modifier for a package/version dependency. *)
-type dependency_modifier = 
+type dependency_modifier =
   | Any     (** When there is only the package name. *)
   | Exactly (** == *)
-  | Above   (** <  *)
-  | Below   (** >  *)
   | AtLeast (** >= *)
   | AtMost  (** <= *)
+  | Below   (** >  *)
+  | Above   (** <  *)
 
 (** A package dependency describing the necessary version of
     a package required by another package. *)

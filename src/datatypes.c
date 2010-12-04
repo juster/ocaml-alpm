@@ -145,10 +145,15 @@ value caml_copy_depmod ( pmdepmod_t depmod )
     CAMLparam0();
     CAMLlocal1( camldepmod );
 
-    if ( depmod > 6 ) {
+    switch ( depmod ) {
+	case PM_DEP_MOD_ANY: idx = 0; break;
+	case PM_DEP_MOD_EQ:  idx = 1; break;
+	case PM_DEP_MOD_GE:  idx = 2; break;
+	case PM_DEP_MOD_LE:  idx = 3; break;
+	case PM_DEP_MOD_GT:  idx = 4; break;
+	case PM_DEP_MOD_LT:  idx = 5; break;
         caml_invalid_argument( "Unrecognized depmod data-type" );
     }
-    idx = depmod - 1;
 
     camldepmod = Val_int( idx );
     CAMLreturn( camldepmod );
