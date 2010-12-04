@@ -380,6 +380,10 @@ module Trans =
                                 file:    string;
                                 ctarget: string; }
 
+    type dep_missing = { target: string;
+                         cause:  string;
+                         dep:    dependency; }
+
     external init       : trans_flag list -> unit    = "oalpm_trans_init"
     external prepare    : unit -> unit               = "oalpm_trans_prepare"
     external commit     : unit -> unit               = "oalpm_trans_commit"

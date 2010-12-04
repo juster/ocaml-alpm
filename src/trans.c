@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <caml/mlvalues.h>
 #include <caml/memory.h>
 #include <caml/fail.h>
@@ -187,10 +189,12 @@ pmtransflag_t caml_to_alpm_transflaglist ( value flag_list )
 value alpm_to_caml_fileconflict ( void * data )
 {
     pmfileconflict_t * conflict = data;
+    const char * str;
+
     CAMLparam0();
     CAMLlocal2( conflict_rec, conflict_type );
 
-    switch ( conflict->type ) {
+    switch ( alpm_fileconflict_get_type( conflict )) {
     case PM_FILECONFLICT_TARGET:     conflict_type = Val_int( 0 ); break;
     case PM_FILECONFLICT_FILESYSTEM: conflict_type = Val_int( 1 ); break;
     default:
@@ -199,22 +203,32 @@ value alpm_to_caml_fileconflict ( void * data )
 
     conflict_rec = caml_alloc( 4, 0 );
     Store_field( conflict_rec, 0, conflict_type );
-    Store_field( conflict_rec, 1, caml_copy_string( conflict->target  ));
-    Store_field( conflict_rec, 2, caml_copy_string( conflict->file    ));
-    Store_field( conflict_rec, 3, caml_copy_string( conflict->ctarget ));
+    str = alpm_fileconflict_get_target( conflict );
+    Store_field( conflict_rec, 1, caml_copy_string( str ));
+    str = alpm_fileconflict_get_file( conflict );
+    Store_field( conflict_rec, 2, caml_copy_string( str ));
+    str = alpm_fileconflict_get_ctarget( conflict );
+    Store_field( conflict_rec, 3, caml_copy_string( str ));
 
     CAMLreturn( conflict_rec );
 }
 
-/* Copy/pasted from ALPM's conflict.c */
-void free_fileconflict ( pmfileconflict_t *conflict )
+value alpm_to_caml_depmissing ( void * data )
 {
-	if ( strlen( conflict->ctarget ) > 0 ) {
-		free(conflict->ctarget);
-	}
-	free(conflict->file);
-	free(conflict->target);
-	free(conflict);
+    pmdepmissing_t * dm = data;
+    const char * str;
+    CAMLparam0();
+    CAMLlocal2( depmiss, dep );
+    
+    dep     = caml_copy_dependency( alpm_miss_get_dep( dm ));
+    depmiss = caml_alloc( 3, 0 );
+    str = alpm_miss_get_target( dm );
+    Store_field( depmiss, 0, caml_copy_string( str ));
+    str = alpm_miss_get_causingpkg( dm );
+    Store_field( depmiss, 1, caml_copy_string( str ));
+    Store_field( depmiss, 2, dep );
+
+    CAMLreturn( depmiss );
 }
 
 /****************************************************************************/

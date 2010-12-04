@@ -240,6 +240,10 @@ module Trans:
                                 file:    string;
                                 ctarget: string; }
 
+    type dep_missing = { target: string;
+                         cause:  string;
+                         dep:    dependency; }
+
     val init       : trans_flag list -> unit
     val prepare    : unit -> unit
     val commit     : unit -> unit
