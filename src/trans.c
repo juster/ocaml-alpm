@@ -181,8 +181,9 @@ pmtransflag_t caml_to_alpm_transflaglist ( value flag_list )
     return bitflags;
 }
 
-/* Errors */
+/* ERRORS */
 
+/* File conflicts */
 value alpm_to_caml_fileconflict ( void * data )
 {
     pmfileconflict_t * conflict = data;
@@ -203,6 +204,17 @@ value alpm_to_caml_fileconflict ( void * data )
     Store_field( conflict_rec, 3, caml_copy_string( conflict->ctarget ));
 
     CAMLreturn( conflict_rec );
+}
+
+/* Copy/pasted from ALPM's conflict.c */
+void free_fileconflict ( pmfileconflict_t *conflict )
+{
+	if ( strlen( conflict->ctarget ) > 0 ) {
+		free(conflict->ctarget);
+	}
+	free(conflict->file);
+	free(conflict->target);
+	free(conflict);
 }
 
 /****************************************************************************/
