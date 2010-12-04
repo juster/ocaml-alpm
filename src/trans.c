@@ -158,7 +158,10 @@ static void oalpm_prog_cb ( pmtransprog_t type, const char * pkg,
 }
 
 /****************************************************************************/
+/* TRANSACTION DATA TYPES
+ */
 
+/* Flags */
 pmtransflag_t caml_to_alpm_transflag ( value flag )
 {
     int flag_idx = Int_val( flag );
@@ -177,6 +180,32 @@ pmtransflag_t caml_to_alpm_transflaglist ( value flag_list )
     bitflags |= caml_to_alpm_transflaglist( Field( flag_list, 1 ));
     return bitflags;
 }
+
+/* Errors */
+
+value alpm_to_caml_fileconflict ( void * data )
+{
+    pmfileconflict_t * conflict = data;
+    CAMLparam0();
+    CAMLlocal2( conflict_rec, conflict_type );
+
+    switch ( conflict->type ) {
+    case PM_FILECONFLICT_TARGET:     conflict_type = Val_int( 0 ); break;
+    case PM_FILECONFLICT_FILESYSTEM: conflict_type = Val_int( 1 ); break;
+    default:
+        caml_failwith( "Unrecognized fileconflict type" );
+    }
+
+    conflict_rec = caml_alloc( 4, 0 );
+    Store_field( conflict_rec, 0, conflict_type );
+    Store_field( conflict_rec, 1, caml_copy_string( conflict->target  ));
+    Store_field( conflict_rec, 2, caml_copy_string( conflict->file    ));
+    Store_field( conflict_rec, 3, caml_copy_string( conflict->ctarget ));
+
+    CAMLreturn( conflict_rec );
+}
+
+/****************************************************************************/
 
 CAMLprim value oalpm_trans_init ( value flaglist )
 {

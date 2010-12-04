@@ -373,6 +373,13 @@ module Trans =
       | Recurseall
       | NoLock
 
+    (* Error Types *)
+    type file_conflict_kind = PackageConflict | FileConflict
+    type file_conflict      = { kind:    file_conflict_kind;
+                                target:  string;
+                                file:    string;
+                                ctarget: string; }
+
     external init       : trans_flag list -> unit    = "oalpm_trans_init"
     external prepare    : unit -> unit               = "oalpm_trans_prepare"
     external commit     : unit -> unit               = "oalpm_trans_commit"

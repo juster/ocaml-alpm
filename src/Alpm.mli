@@ -215,7 +215,7 @@ module Trans:
       -> unit
     val disable_progresscb : unit -> unit
 
-        (* Basic Transaction Functions *)
+        (* Transaction Types *)
     type trans_flag =
         NoDeps
       | Force
@@ -232,6 +232,13 @@ module Trans:
       | Unneeded
       | Recurseall
       | NoLock
+
+    (* Error Types *)
+    type file_conflict_kind = PackageConflict | FileConflict
+    type file_conflict      = { kind:    file_conflict_kind;
+                                target:  string;
+                                file:    string;
+                                ctarget: string; }
 
     val init       : trans_flag list -> unit
     val prepare    : unit -> unit
