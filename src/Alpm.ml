@@ -13,8 +13,8 @@ type dependency_modifier =
   | Exactly (** == *)
   | AtLeast (** >= *)
   | AtMost  (** <= *)
-  | Below   (** >  *)
-  | Above   (** <  *)
+  | Above   (** >  *)
+  | Below   (** <  *)
 
 type dependency = { package  : string;
                     modifier : dependency_modifier;
