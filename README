@@ -1,0 +1,51 @@
+-*- org -*-
+
+* INTRODUCTION
+
+The "Alpm" module is a binding for the Ocaml language that allows low
+level access to ArchLinux's package management.
+
+** ALPM
+The ALPM acronym stands for ArchLinux Package Manager (I believe). The
+standard ArchLinux package utility uses libalpm for tasks such as
+keeping track of installed packages, installing packages, checking
+conflicts, etc. Libalpm is a C library that is bundled with pacman.
+
+* INSTALLATION
+
+This project uses ocamlbuild, a replacement for the GNU make utility.
+A shell script is included called "build.sh" which wraps ocamlbuild to
+closely resemble a make sequence.
+
+The following example untars the project archive, cd's to the new
+extracted directory and then builds and installs the project
+using ocamlbuild and ocamlfind.
+
+: tar xf ocaml-build-1.0.tar.gz
+: cd ocaml-build-1.0
+: ./build.sh
+: ./build.sh install
+
+Allowable arguments to ./build.sh include "clean", "all", or "install".
+
+You must have findlib installed in order to install the "alpm" package
+into the system-wide location. The "install" rule won't work without it.
+
+* DOCUMENTATION
+
+Documentation will be embedded inside the Ocaml source code. I still
+have not yet got around to documenting it. I will probably not document
+heavily because I may be the only one using this. If you know how to use
+libalpm from C you can figure out how it works. Look at the Alpm.mli
+file for the exposed classes, functions, and data types.
+
+* TESTS
+
+One day I would like to use oUnit for an automated testing framework.
+Currently there are a few tests programs that are included in the
+test/ directory. These also give you an idea how to use the
+Alpm module.
+
+* AUTHOR
+
+Justin Davis <<jrcd 83 at gmail.com>>
