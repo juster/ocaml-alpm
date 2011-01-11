@@ -1,0 +1,5 @@
+name            = "alpm"
+version         = "0.01"
+description     = "Bindings for libalpm the ArchLinux Package Manager"
+archive(byte)   = "libalpm.cma"
+archive(native) = "libalpm.cmxa"
