@@ -1,2 +1,2 @@
-<test*.{byte,native}>: use_libalpm, use_unix, use_str
+<test/test*.{byte,native}>: use_libalpm, use_unix, use_str
 
