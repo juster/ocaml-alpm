@@ -118,4 +118,4 @@ let _ =
     print_endline "Initialized transaction." ;
     Alpm.Trans.release () ;
     print_endline "Released transaction."
-  with Error(str) -> print_transerr str ;;
+  with AlpmError(str) -> print_transerr str ;;
